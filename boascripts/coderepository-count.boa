@@ -1,0 +1,11 @@
+# What is the distribution of the number of repositories per project?
+p: Project = input;
+counts: output sum[int] of int;
+
+visit(p, visitor {
+    before n: Project -> {
+        ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i])))
+            stop;
+        counts[len(p.code_repositories)] << 1;
+    }
+});
