@@ -8,10 +8,10 @@ visit(p, visitor {
         # Only want Java projects
         ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i])))
             stop;
-    before node: CodeRepository ->
-        if (len(node.revisions) > 0) {
-            lastindex := len(node.revisions) - 1;
-            lastyear := yearof(node.revisions[lastindex].commit_date);
+    before repo: CodeRepository ->
+        if (len(repo.revisions) > 0) {
+            lastindex := len(repo.revisions) - 1;
+            lastyear := yearof(repo.revisions[lastindex].commit_date);
             if (lastyear > 2013)
                 stop;
         }
