@@ -1,0 +1,5 @@
+# projects per id
+p: Project = input;
+counts: output sum[string] of int;
+
+counts[p.id] << 1;

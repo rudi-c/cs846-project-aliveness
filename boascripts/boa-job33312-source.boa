@@ -1,0 +1,6 @@
+# Distribution of projects in each number of maintainers
+p: Project = input;
+counts: output sum[int] of int;
+
+if(def(p.maintainers))
+    counts[len(p.maintainers)] << 1;

@@ -1,0 +1,10 @@
+# Distribution of projects across number of commits
+p: Project = input;
+counts: output sum[int] of int;
+
+numCommitsThisRepo := 0;
+foreach (i: int; def(p.code_repositories[i])) {
+    cr := p.code_repositories[i];
+    numCommitsThisRepo = numCommitsThisRepo + len(cr.revisions);
+}
+counts[numCommitsThisRepo] << 1;

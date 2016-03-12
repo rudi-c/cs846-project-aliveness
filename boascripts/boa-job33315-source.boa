@@ -1,0 +1,5 @@
+# Distribution of projects across number of commits
+p: Project = input;
+counts: output sum[int] of int;
+
+counts[len(p.code_repositories)] << 1;

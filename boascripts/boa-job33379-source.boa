@@ -1,0 +1,27 @@
+# Distribution of projects in # of days between the 1st and last commit
+# Considers the maximum number of days in each repo
+p: Project = input;
+counts: output sum[int] of int;
+
+maxNumCommitsThisProject := 0;
+
+foreach (i: int; def(p.code_repositories[i])) {
+    cr := p.code_repositories[i];
+    commitInitDays := yearof(now())*365 + dayofyear(now());
+    commitLastDays := 0;
+    commitCurrDays := 0;
+    foreach (j: int; def(cr.revisions[j])) {
+        commitCurrDays = yearof(cr.revisions[j].commit_date)*365 + dayofyear(cr.revisions[j].commit_date);
+        if(commitCurrDays < commitInitDays)
+            commitInitDays = commitCurrDays;
+        if(commitCurrDays > commitLastDays)
+            commitLastDays = commitCurrDays;
+    }
+    commitDiffDays := commitLastDays - commitInitDays;
+    
+    if (commitDiffDays > maxNumCommitsThisProject)
+    maxNumCommitsThisProject = commitDiffDays;
+
+}
+
+counts[maxNumCommitsThisProject] << 1;

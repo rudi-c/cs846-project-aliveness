@@ -1,0 +1,6 @@
+# Distribution of projects in each number of developers
+p: Project = input;
+counts: output sum[int] of int;
+
+if(def(p.developers))
+    counts[len(p.developers)] << 1;

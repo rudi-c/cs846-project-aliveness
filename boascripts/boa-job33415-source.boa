@@ -1,0 +1,10 @@
+# Number of Projects that contain 'x' doc files
+p: Project = input;
+counts: output sum of int;
+
+visit(p, visitor {
+    before node: Project -> {
+        if(hasfiletype(p, "jar"))
+            counts << 1;
+    }
+});
