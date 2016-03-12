@@ -1,0 +1,12 @@
+# What is the year of the last commits of each project, aggregated?
+p: Project = input;
+counts: output sum[int] of int;
+
+visit(p, visitor {
+	before n: Project -> ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i]))) stop;
+	before node: CodeRepository ->
+	    if (len(node.revisions) > 0) {
+	        lastindex := len(node.revisions) - 1;
+            counts[yearof(node.revisions[lastindex].commit_date)] << 1;
+	    }
+});
