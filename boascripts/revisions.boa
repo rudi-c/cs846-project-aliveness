@@ -1,7 +1,7 @@
-# What is the time of each commit for each Java project?
+# Get the date and author of every revision of every relevant project.
 p: Project = input;
 # Output (use only one letter to reduce size of output)
-o: output collection[string][string] of time;
+o: output collection[string][string] of string;
 
 visit(p, visitor {
     before n: Project ->
@@ -19,6 +19,10 @@ visit(p, visitor {
         # http://stackoverflow.com/questions/18134627
         # The largest projects need ~12 characters/40 to stay unique
         shorthash := substring(rev.id, 0, 15);
-        o[p.id][shorthash] << rev.commit_date;
+        data := format("%s|%s",
+                       formattime("%d/%m/%y %H:%M:%S", rev.commit_date),
+                       rev.author.username
+                      );
+        o[p.id][shorthash] << data;
     }
 });

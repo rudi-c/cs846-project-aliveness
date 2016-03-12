@@ -10,18 +10,18 @@ def parse_revision_dates(c):
     Expect lines of the format:
     o[project id][revision hash] = date
 
-    (Output of commit-dates.boa)
+    (Output of revisions.boa)
     """
-    with open("commit-dates-small.txt") as f:
+    with open("revisions-small.txt") as f:
         for line in f.readlines():
-            matches = re.match(r'o\[(.*)\]\[(.*)\] = (.*)', line)
+            matches = re.match(r'o\[(.*)\]\[(.*)\] = (.*)\|(.*)', line)
             project_id = int(matches.group(1))
             revision_hash = matches.group(2)
+            date = matches.group(3)
+            author = matches.group(4)
 
-            # Their time is given in microseconds since epoch. Convert to seconds.
-            date = int(matches.group(3)) / 1000 / 1000
-
-            fields = ",".join("'" + str(v) + "'" for v in (revision_hash, project_id, date))
+            fields = ",".join('"' + str(v) + '"'
+                              for v in (revision_hash, project_id, date, author))
             c.execute("INSERT INTO revisions VALUES (%s)" % fields)
 
 def main(args):
@@ -33,7 +33,7 @@ def main(args):
     c.execute('''CREATE TABLE repos
                  (id)''')
     c.execute('''CREATE TABLE revisions
-                 (id, project, date)''')
+                 (id, project, date, author)''')
 
     parse_revision_dates(c)
 
