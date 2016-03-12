@@ -1,0 +1,24 @@
+# What is the time of each commit for each Java project?
+p: Project = input;
+# Output (use only one letter to reduce size of output)
+o: output collection[string][string] of time;
+
+visit(p, visitor {
+    before n: Project ->
+        # Only want Java projects
+        ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i])))
+            stop;
+    before node: CodeRepository ->
+        if (len(node.revisions) > 0) {
+            lastindex := len(node.revisions) - 1;
+            lastyear := yearof(node.revisions[lastindex].commit_date);
+            if (lastyear > 2013)
+                stop;
+        }
+    before rev: Revision -> {
+        # http://stackoverflow.com/questions/18134627
+        # The largest projects need ~12 characters/40 to stay unique
+        shorthash := substring(rev.id, 0, 15);
+        o[p.id][shorthash] << rev.commit_date;
+    }
+});
