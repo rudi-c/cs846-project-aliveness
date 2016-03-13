@@ -14,6 +14,9 @@ def parse_projects(c, filename):
 
     (Output of project-repository.boa)
     """
+    if not os.path.isfile(filename):
+        raise Exception("Expected file %s" % filename)
+
     with open(filename) as f:
         for line in f:
             matches = re.match(r'o\[(.*)\] = (.*)\|(.*)|(.*)', line)
@@ -36,6 +39,9 @@ def parse_revisions(c, filename):
 
     (Output of revisions.boa)
     """
+    if not os.path.isfile(filename):
+        raise Exception("Expected file %s" % filename)
+
     with open(filename) as f:
         for line in f:
             matches = re.match(r'o\[(.*)\]\[(.*)\] = (.*)\|(.*)', line)
@@ -58,6 +64,9 @@ def parse_span(filename):
 
     (Output of activity-span.boa)
     """
+    if not os.path.isfile(filename):
+        raise Exception("Expected file %s" % filename)
+
     print "Project lifespans in days"
 
     results = []
