@@ -1,0 +1,22 @@
+# Try to find Javadocs
+# The getcomments function is presumably available but
+# undocumented according to Robert Dyer but I get an error instead.
+p: Project = input;
+o: output collection of string;
+
+visit(p, visitor {
+    before node: CodeRepository -> {
+        # only look at the latest snapshot
+        # and only include Java files
+        snapshot := getsnapshot(node, "SOURCE_JAVA_JLS");
+        foreach (i: int; def(snapshot[i])) {
+            ast := getast(snapshot[i]);
+            comments := getcomments(ast);
+            if (len(comments) > 0) {
+                o << comments[0];
+                stop;
+            }
+        }
+        stop;
+    }
+});
