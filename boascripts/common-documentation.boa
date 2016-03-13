@@ -1,0 +1,25 @@
+# What are the 30 most common .md and .txt files?
+p: Project = input;
+counts: output top(100) of string weight int;
+
+visit(p, visitor {
+    before n: Project ->
+        # Only want Java projects
+        ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i])))
+            stop;
+    before repo: CodeRepository -> {
+        if (len(repo.revisions) > 0) {
+            lastindex := len(repo.revisions) - 1;
+            lastyear := yearof(repo.revisions[lastindex].commit_date);
+            if (lastyear > 2013)
+                stop;
+        }
+        files := getsnapshot(repo);
+        foreach (i: int; def(files[i])) {
+            fname := lowercase(files[i].name);
+            if (match(`\.md$`, fname) ||
+                match(`\.txt$`, fname))
+                counts << fname weight 1;
+        }
+    }
+});
