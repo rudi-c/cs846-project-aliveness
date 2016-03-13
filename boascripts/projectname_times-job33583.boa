@@ -1,0 +1,5 @@
+# trying to get forks
+p: Project = input;
+counts: output sum[string] of int;
+
+counts[substring(p.name, strrfind("/", p.name))] << 1;

@@ -1,0 +1,5 @@
+# trying to get forks
+p: Project = input;
+counts: output collection[string] of string;
+
+counts[substring(p.name, strrfind("/", p.name))] << p.id;
