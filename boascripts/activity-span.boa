@@ -1,0 +1,34 @@
+# Distribution of projects in # of days between the 1st and last commit
+#
+# Follow up from boa-job33379 with filters.
+p: Project = input;
+counts: output sum[int] of int;
+
+visit(p, visitor {
+    before n: Project ->
+        # Only want Java projects
+        ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i])))
+            stop;
+    before repo: CodeRepository -> {
+        if (len(repo.revisions) > 0) {
+            lastindex := len(repo.revisions) - 1;
+            lastyear := yearof(repo.revisions[lastindex].commit_date);
+            if (lastyear > 2013)
+                stop;
+        }
+        earliest := 99999999;
+        latest := -1;
+
+        foreach (j: int; def(repo.revisions[j])) {
+            # Good enough approximation.
+            revision_day := yearof(repo.revisions[j].commit_date) * 365
+                          + dayofyear(repo.revisions[j].commit_date);
+            if (revision_day < earliest)
+                earliest = revision_day;
+            if (revision_day > latest)
+                latest = revision_day;
+        }
+
+        counts[latest - earliest] << 1;
+    }
+});

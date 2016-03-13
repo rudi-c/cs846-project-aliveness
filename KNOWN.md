@@ -57,3 +57,28 @@ counts = license-2.0.txt, 252.0
 counts = bin/proguard.txt, 238.0
 counts = header.txt, 232.0
 ```
+
+# What is the distribution of lifespan of projects?
+
+Script: activity-span.boa + parse into nicer format
+Results:
+
+```
+Project lifespans in days
+Invalid (no commits?): 97317
+[0, 0]:         87069
+[1, 2]:         23284
+[3, 6]:         19377
+[7, 14]:        20942
+[15, 30]:       21248
+[31, 62]:       21583
+[63, 126]:      20229
+[127, 254]:     16513
+[255, 510]:     13514
+[511, 1022]:    8528
+[1023, 2046]:   4408
+[2047, 4094]:   1365
+[4095, 8190]:   201
+[8191, 16382]:  62
+[32767, 65534]: 1
+```
