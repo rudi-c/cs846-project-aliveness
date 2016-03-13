@@ -13,6 +13,12 @@ def main():
 
     db_connection = open_db(args.full)
 
+    projects = get_projects(db_connection)
+
+    # Print a few projects
+    for i in range(0, 10):
+        print projects[i]
+
     # Example, print the founder of project 10267115
     revisions = get_revisions_for_project(db_connection, 10267115)
     for rev in revisions:
