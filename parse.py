@@ -17,8 +17,10 @@ def parse_projects(c, filename):
     if not os.path.isfile(filename):
         raise Exception("Expected file %s" % filename)
 
+    print "Parsing projects..."
+
     with open(filename) as f:
-        for line in f:
+        for i, line in enumerate(f):
             matches = re.match(r'o\[(.*)\] = (.*)\|(.*)|(.*)', line)
             project_id = int(matches.group(1))
             name = matches.group(2)
@@ -26,11 +28,21 @@ def parse_projects(c, filename):
             has_docs = bool(matches.group(4))
 
             data = (project_id, name, rev_count, has_docs)
+
             try:
                 c.execute("INSERT INTO repos VALUES (?, ?, ?, ?)", data)
             except Exception as e:
                 print data
                 raise e
+
+            if i % 100 == 0:
+                # Using a carriage return allows the terminal to override
+                # the previous line, making it more like a progress effect.
+                print "%d lines read\r" % i,
+
+    print ""
+
+
 
 def parse_revisions(c, filename):
     """
@@ -42,8 +54,10 @@ def parse_revisions(c, filename):
     if not os.path.isfile(filename):
         raise Exception("Expected file %s" % filename)
 
+    print "Parsing revisions..."
+
     with open(filename) as f:
-        for line in f:
+        for i, line in enumerate(f):
             matches = re.match(r'o\[(.*)\]\[(.*)\] = (.*)\|(.*)', line)
             project_id = int(matches.group(1))
             revision_hash = matches.group(2)
@@ -56,6 +70,13 @@ def parse_revisions(c, filename):
             except Exception as e:
                 print data
                 raise e
+
+            if i % 100 == 0:
+                # Using a carriage return allows the terminal to override
+                # the previous line, making it more like a progress effect.
+                print "%d lines read\r" % i,
+
+    print ""
 
 def parse_span(filename):
     """
