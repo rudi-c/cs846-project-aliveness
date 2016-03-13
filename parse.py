@@ -15,16 +15,19 @@ def parse_projects(c, filename):
     (Output of project-repository.boa)
     """
     with open(filename) as f:
-        for line in f.readlines():
+        for line in f:
             matches = re.match(r'o\[(.*)\] = (.*)\|(.*)|(.*)', line)
             project_id = int(matches.group(1))
             name = matches.group(2)
             rev_count = int(matches.group(3))
             has_docs = bool(matches.group(4))
 
-            fields = ",".join('"' + str(v) + '"'
-                              for v in (project_id, name, rev_count, has_docs))
-            c.execute("INSERT INTO repos VALUES (%s)" % fields)
+            data = (project_id, name, rev_count, has_docs)
+            try:
+                c.execute("INSERT INTO repos VALUES (?, ?, ?, ?)", data)
+            except Exception as e:
+                print data
+                raise e
 
 def parse_revisions(c, filename):
     """
@@ -34,16 +37,19 @@ def parse_revisions(c, filename):
     (Output of revisions.boa)
     """
     with open(filename) as f:
-        for line in f.readlines():
+        for line in f:
             matches = re.match(r'o\[(.*)\]\[(.*)\] = (.*)\|(.*)', line)
             project_id = int(matches.group(1))
             revision_hash = matches.group(2)
             date = matches.group(3)
             author = matches.group(4)
 
-            fields = ",".join('"' + str(v) + '"'
-                              for v in (revision_hash, project_id, date, author))
-            c.execute("INSERT INTO revisions VALUES (%s)" % fields)
+            data = (revision_hash, project_id, date, author)
+            try:
+                c.execute("INSERT INTO revisions VALUES (?, ?, ?, ?)", data)
+            except Exception as e:
+                print data
+                raise e
 
 def parse_span(filename):
     """
@@ -101,6 +107,7 @@ def main():
         pass
 
     conn = sqlite3.connect(database_name)
+    conn.text_factory = str     # easiest way to deal with encodings right now
     c = conn.cursor()
 
     c.execute('''CREATE TABLE repos
