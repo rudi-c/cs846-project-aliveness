@@ -21,7 +21,7 @@ def parse_projects(cursor, filename):
 
     with open(filename) as f:
         for i, line in enumerate(f):
-            matches = re.match(r'o\[(.*)\] = (.*)\|(.*)|(.*)', line)
+            matches = re.match(r'o\[(.*)\] = (.*)\|(.*)\|(.*)', line)
             project_id = int(matches.group(1))
             name = matches.group(2)
             rev_count = int(matches.group(3))
@@ -41,8 +41,6 @@ def parse_projects(cursor, filename):
                 print "%d lines read\r" % i,
 
     print ""
-
-
 
 def parse_revisions(cursor, filename):
     """
@@ -66,7 +64,7 @@ def parse_revisions(cursor, filename):
 
             data = (revision_hash, project_id, date, author)
             try:
-                c.execute("INSERT INTO revisions VALUES (?, ?, ?, ?)", data)
+                cursor.execute("INSERT INTO revisions VALUES (?, ?, ?, ?)", data)
             except Exception as e:
                 print data
                 raise e
