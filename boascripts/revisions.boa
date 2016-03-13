@@ -14,6 +14,8 @@ visit(p, visitor {
             lastyear := yearof(repo.revisions[lastindex].commit_date);
             if (lastyear > 2013)
                 stop;
+        } else {
+            stop;
         }
     before rev: Revision -> {
         # http://stackoverflow.com/questions/18134627
