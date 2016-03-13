@@ -1,0 +1,22 @@
+# Get the date and author of every revision of every relevant project.
+p: Project = input;
+# Output (use only one letter to reduce size of output)
+o: output collection[string] of string;
+
+visit(p, visitor {
+    before n: Project ->
+        # Only want Java projects
+        ifall (i: int; !match(`^java$`, lowercase(n.programming_languages[i])))
+            stop;
+    before repo: CodeRepository -> {
+        if (len(repo.revisions) > 0) {
+            lastindex := len(repo.revisions) - 1;
+            lastyear := yearof(repo.revisions[lastindex].commit_date);
+            if (lastyear > 2013)
+                stop;
+        }
+        data := format("%s|%d",
+                       p.name, len(repo.revisions));
+        o[p.id] << data;
+    }
+});
