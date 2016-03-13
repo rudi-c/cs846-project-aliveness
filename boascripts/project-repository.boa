@@ -15,8 +15,20 @@ visit(p, visitor {
             if (lastyear > 2013)
                 stop;
         }
-        data := format("%s|%d",
-                       p.name, len(repo.revisions));
+
+        # Look for a README file
+        # Store as int instead of bool so that the output uses less characteres.
+        has_readme := 0;
+        files := getsnapshot(repo);
+        foreach (i: int; def(files[i])) {
+            fname := lowercase(files[i].name);
+            if (fname == "readme.md" || fname == "readme.txt") {
+                has_readme = 1;
+            }
+        }
+
+        data := format("%s|%d|%d",
+                       p.name, len(repo.revisions), has_readme);
         o[p.id] << data;
     }
 });

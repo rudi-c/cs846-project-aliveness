@@ -9,19 +9,20 @@ import sys
 def parse_projects(c):
     """
     Expect lines of the format:
-    o[project id] = name|revision count
+    o[project id] = name|revision count|has docs
 
     (Output of project-repository.boa)
     """
     with open("projects-small.txt") as f:
         for line in f.readlines():
-            matches = re.match(r'o\[(.*)\] = (.*)\|(.*)', line)
+            matches = re.match(r'o\[(.*)\] = (.*)\|(.*)|(.*)', line)
             project_id = int(matches.group(1))
             name = matches.group(2)
             rev_count = int(matches.group(3))
+            has_docs = bool(matches.group(4))
 
             fields = ",".join('"' + str(v) + '"'
-                              for v in (project_id, name, rev_count))
+                              for v in (project_id, name, rev_count, has_docs))
             c.execute("INSERT INTO repos VALUES (%s)" % fields)
 
 def parse_revisions(c):
@@ -88,7 +89,7 @@ def main(args):
     c = conn.cursor()
 
     c.execute('''CREATE TABLE repos
-                 (id, name, revision_count)''')
+                 (id, name, revision_count, has_docs)''')
     c.execute('''CREATE TABLE revisions
                  (id, project, date, author)''')
 
