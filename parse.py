@@ -7,7 +7,7 @@ import re
 import sqlite3
 import sys
 
-def parse_projects(c, filename):
+def parse_projects(cursor, filename):
     """
     Expect lines of the format:
     o[project id] = name|revision count|has docs
@@ -30,7 +30,7 @@ def parse_projects(c, filename):
             data = (project_id, name, rev_count, has_docs)
 
             try:
-                c.execute("INSERT INTO repos VALUES (?, ?, ?, ?)", data)
+                cursor.execute("INSERT INTO repos VALUES (?, ?, ?, ?)", data)
             except Exception as e:
                 print data
                 raise e
@@ -44,7 +44,7 @@ def parse_projects(c, filename):
 
 
 
-def parse_revisions(c, filename):
+def parse_revisions(cursor, filename):
     """
     Expect lines of the format:
     o[project id][revision hash] = date|author
@@ -138,20 +138,20 @@ def main():
 
     conn = sqlite3.connect(database_name)
     conn.text_factory = str     # easiest way to deal with encodings right now
-    c = conn.cursor()
+    cursor = conn.cursor()
 
-    c.execute('''CREATE TABLE repos
-                 (id, name, revision_count, has_docs)''')
-    c.execute('''CREATE TABLE revisions
-                 (id, project, date, author)''')
+    cursor.execute('''CREATE TABLE repos
+                      (id, name, revision_count, has_docs)''')
+    cursor.execute('''CREATE TABLE revisions
+                      (id, project, date, author)''')
 
     parse_span("activity-span.txt")
     if args.full:
-        parse_projects(c, "projects.txt")
-        parse_revisions(c, "revisions.txt")
+        parse_projects(cursor, "projects.txt")
+        parse_revisions(cursor, "revisions.txt")
     else:
-        parse_projects(c, "projects-small.txt")
-        parse_revisions(c, "revisions-small.txt")
+        parse_projects(cursor, "projects-small.txt")
+        parse_revisions(cursor, "revisions-small.txt")
 
     conn.commit()
     conn.close()
