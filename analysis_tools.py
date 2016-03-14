@@ -1,10 +1,11 @@
+import math
 import random
 import sqlite3
 
 from datetime import datetime
 
 # September 1st
-CUTOFF_DATE = datetime.date(2013, 9, 1)
+CUTOFF_DATE = datetime(2013, 9, 1)
 
 class Project(object):
     def __init__(self, db_row):
@@ -63,3 +64,21 @@ def get_founder(revisions):
 # Return a random sample from a list, maintaining the original order of the list
 def get_random_sample(lst, n):
     return [lst[i] for i in sorted(random.sample(xrange(len(mylist)), n))]
+
+# Given a list of integers, bin them logarithmically (base 2).
+# Return a list of ((start, end), count)
+def log_bin(lst):
+    log_bins = {}
+    for n in lst:
+        assert n >= 0
+        index = int(math.log(n + 1, 2))
+        if index in log_bins:
+            log_bins[index] += 1
+        else:
+            log_bins[index] = 1
+
+    non_log_bins = []
+    for index, count in log_bins.iteritems():
+        non_log_bins.append((int(pow(2.0, index)) - 1, count))
+    non_log_bins = sorted(non_log_bins)
+    return [((start, start * 2), str(count)) for start, count in non_log_bins]
