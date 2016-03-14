@@ -1,6 +1,10 @@
+import random
 import sqlite3
 
 from datetime import datetime
+
+# September 1st
+CUTOFF_DATE = datetime.date(2013, 9, 1)
 
 class Project(object):
     def __init__(self, db_row):
@@ -55,3 +59,7 @@ def get_revisions_for_project(db_connection, project_id):
 # Get the project founder from a list of revisions.
 def get_founder(revisions):
     return revisions[0].name
+
+# Return a random sample from a list, maintaining the original order of the list
+def get_random_sample(lst, n):
+    return [lst[i] for i in sorted(random.sample(xrange(len(mylist)), n))]
