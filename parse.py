@@ -7,6 +7,8 @@ import re
 import sqlite3
 import sys
 
+from datetime import datetime
+
 def parse_projects(cursor, filename):
     """
     Expect lines of the format:
@@ -56,11 +58,20 @@ def parse_revisions(cursor, filename):
 
     with open(filename) as f:
         for i, line in enumerate(f):
-            matches = re.match(r'o\[(.*)\]\[(.*)\] = (.*)\|(.*)', line)
+            # Warning: author names can have vertical |, could screw up parsing
+            # if not careful!
+            matches = re.match(r'o\[(.*)\]\[(.*)\] = ([^\|]*)\|(.*)', line)
             project_id = int(matches.group(1))
             revision_hash = matches.group(2)
             date = matches.group(3)
             author = matches.group(4)
+
+            # Make sure we can parse the date.
+            try:
+                datetime.strptime(date, "%d/%m/%y %H:%M:%S")
+            except ValueError:
+                print "Problem reading : " + line
+                raise Exception()
 
             data = (revision_hash, project_id, date, author)
             try:
