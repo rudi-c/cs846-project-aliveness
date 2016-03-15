@@ -11,16 +11,28 @@ def time_since_last_commit_distribution(db_connection):
           days before cutoff date"""
     projects = get_projects(db_connection)
 
+    print "Total number of projects: %d" % len(projects)
+
     days_before_cutoff = []
-    for project in projects:
+    for i, project in enumerate(projects):
         revisions = get_revisions_for_project(db_connection, project.id)
+        revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
 
         # Make sure we have revisions at all
         if len(revisions) > 0:
             last_date = revisions[-1].date
-            if last_date < CUTOFF_DATE:
-                difference = (CUTOFF_DATE - last_date).days
-                days_before_cutoff.append(difference)
+            assert last_date < CUTOFF_DATE
+            difference = (CUTOFF_DATE - last_date).days
+            days_before_cutoff.append(difference)
+
+        if i % 100 == 0:
+            # Using a carriage return allows the terminal to override
+            # the previous line, making it more like a progress effect.
+            print ("%d percent of projects processed\r" %
+                   int(float(i) / len(projects) * 100)),
+
+    print "Finished"
+
     bins = log_bin(days_before_cutoff)
     for (start, end), count in bins:
         print ("[%d, %d]:" % (start, end)).ljust(16) + str(count)

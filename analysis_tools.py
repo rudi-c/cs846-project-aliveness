@@ -57,6 +57,11 @@ def get_revisions_for_project(db_connection, project_id):
     revisions = [Revision(db_row) for db_row in cursor]
     return sorted(revisions, key=lambda revision: revision.date)
 
+# Returns a new list of revisions that only contain the revisions before a
+# cutoff date
+def get_revisions_before_cutoff(revisions, date):
+    return [revision for revision in revisions if revision.date < date]
+
 # Get the project founder from a list of revisions.
 def get_founder(revisions):
     return revisions[0].name
