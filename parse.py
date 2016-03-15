@@ -162,6 +162,11 @@ def main():
         parse_projects(cursor, "projects-small.txt")
         parse_revisions(cursor, "revisions-small.txt")
 
+    # Need to create index to select rows based on project id.
+    # Otherwise it would read the whole table everytime we query revisions
+    # for a project.
+    cursor.execute('''CREATE INDEX rev_project_index ON revisions (project)''')
+
     conn.commit()
     conn.close()
 
