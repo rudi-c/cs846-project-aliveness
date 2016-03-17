@@ -65,7 +65,8 @@ def compute_feature_vectors(db_connection, feature_functions):
                 break
 
             # Features
-            # TODO
+            feature_vector.append([feature_function(project, backtest_revision_history, backtest_cutoff_date) for feature_function in feature_functions])
+            
 
             # Label
             alive = len(backtest_revision_future) > 0
@@ -99,7 +100,9 @@ def main():
     features, labels = compute_feature_vectors(db_connection,
         [feature_functions.date_before_last_revision])
 
-    plt.plot([1,2,3,4], [1,4,9,16], 'ro')
+    features = zip(*features)
+
+    plt.plot(features[0], labels, 'ro')
     #plot.plot(features, labels, 'ro')
     #plt.axis([0, 6, 0, 20])
     plt.show()
