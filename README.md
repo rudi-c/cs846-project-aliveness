@@ -1,5 +1,12 @@
 # How to use
 
+## Installation
+
+```
+sudo apt-get install python-gtk
+sudo apt-get install python-matplotlib
+```
+
 ## Parsing mined data
 
 See `parse.py`

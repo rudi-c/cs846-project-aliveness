@@ -4,7 +4,10 @@ import argparse
 import math
 import sys
 
+import matplotlib.pyplot as plt
+
 from analysis_tools import *
+import feature_functions
 
 def time_since_last_commit_distribution(db_connection):
     print """Distribution of projects according to time of last commit in
@@ -37,6 +40,38 @@ def time_since_last_commit_distribution(db_connection):
     for (start, end), count in bins:
         print ("[%d, %d]:" % (start, end)).ljust(16) + str(count)
 
+def compute_feature_vectors(db_connection, feature_functions):
+    projects = get_projects(db_connection)
+
+    feature_vector = []
+    label_vector = []
+
+    for i, project in enumerate(projects):
+        revisions = get_revisions_for_project(db_connection, project.id)
+        revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
+
+        backtest_cutoff_date = CUTOFF_DATE
+
+        # Keep backtesting further back in time until there's no more revision
+        # history.
+        while True:
+            # One month at a time.
+            backtest_cutoff_date = backtest_cutoff_date - timedelta(days=30)
+
+            backtest_revision_history = get_revisions_before_cutoff(revisions, backtest_cutoff_date)
+            backtest_revision_future = get_revisions_after_cutoff(revisions, backtest_cutoff_date)
+
+            if len(backtest_revision_history) == 0:
+                break
+
+            # Features
+            # TODO
+
+            # Label
+            alive = len(backtest_revision_future) > 0
+            label_vector.append(alive)
+
+    return feature_vector, label_vector
 
 def main():
     # Command-line arguments.
@@ -60,6 +95,14 @@ def main():
     print get_founder(revisions)
 
     time_since_last_commit_distribution(db_connection)
+
+    features, labels = compute_feature_vectors(db_connection,
+        [feature_functions.date_before_last_revision])
+
+    plt.plot([1,2,3,4], [1,4,9,16], 'ro')
+    #plot.plot(features, labels, 'ro')
+    #plt.axis([0, 6, 0, 20])
+    plt.show()
 
 
 if __name__ == "__main__":

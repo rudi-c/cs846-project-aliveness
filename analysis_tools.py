@@ -2,7 +2,7 @@ import math
 import random
 import sqlite3
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # September 1st
 CUTOFF_DATE = datetime(2013, 9, 1)
@@ -56,6 +56,11 @@ def get_revisions_for_project(db_connection, project_id):
 
     revisions = [Revision(db_row) for db_row in cursor]
     return sorted(revisions, key=lambda revision: revision.date)
+
+# Returns a new list of revisions that only contain the revisions after a
+# cutoff date
+def get_revisions_after_cutoff(revisions, date):
+    return [revision for revision in revisions if revision.date > date]
 
 # Returns a new list of revisions that only contain the revisions before a
 # cutoff date
