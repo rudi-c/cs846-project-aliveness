@@ -1,0 +1,5 @@
+# Get other attributes of projects
+p: Project = input;
+counts: output collection[string] of string;
+
+counts[p.id] << substring(format("%b", p.donations),0,1);
