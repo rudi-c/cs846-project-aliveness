@@ -32,7 +32,7 @@ def parse_projects(cursor, filename):
             data = (project_id, name, rev_count, has_docs)
 
             try:
-                cursor.execute("INSERT INTO repos VALUES (?, ?, ?, ?)", data)
+                cursor.execute("INSERT INTO repos (id, name, revision_count, has_docs) VALUES (?, ?, ?, ?)", data)
             except Exception as e:
                 print data
                 raise e
@@ -42,6 +42,45 @@ def parse_projects(cursor, filename):
                 # the previous line, making it more like a progress effect.
                 print "%d lines read\r" % i,
 
+    print ""
+
+
+def parse_projects_additional(cursor, filename):
+    """
+        Expect lines of the format:
+        o[project id] = name|revision count|has docs
+        
+        (Output of project-repository.boa)
+        """
+    if not os.path.isfile(filename):
+        raise Exception("Expected file %s" % filename)
+    
+    print "Parsing projects again..."
+
+    with open(filename) as f:
+        for i, line in enumerate(f):
+            matches = re.match(r'o\[(.*)\] = ([^\|]*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)', line)
+            project_id = int(matches.group(1))
+            created_date = matches.group(2)
+            description_size = int(matches.group(3))
+            number_of_licenses = bool(matches.group(4))
+            number_of_operating_systems = int(matches.group(5))
+            number_of_programming_languages = int(matches.group(6))
+            number_of_topics = int(matches.group(7))
+            
+            data = (created_date, description_size, number_of_licenses, number_of_operating_systems, number_of_programming_languages, number_of_topics, project_id)
+            
+            try:
+                cursor.execute("UPDATE repos SET created_date=?, description_size=?, number_of_licenses=?, number_of_operating_systems=?, number_of_programming_languages=?, number_of_topics=? WHERE id=?", data)
+            except Exception as e:
+                print data
+                raise e
+    
+            if i % 100 == 0:
+                # Using a carriage return allows the terminal to override
+                # the previous line, making it more like a progress effect.
+                print "%d lines read\r" % i,
+        
     print ""
 
 def parse_revisions(cursor, filename):
@@ -150,7 +189,7 @@ def main():
     cursor = conn.cursor()
 
     cursor.execute('''CREATE TABLE repos
-                      (id, name, revision_count, has_docs)''')
+                      (id, name, revision_count, has_docs, created_date, description_size, accepts_donations, number_of_licenses, number_of_operating_systems, number_of_programming_languages, number_of_topics)''')
     cursor.execute('''CREATE TABLE revisions
                       (id, project, date, author)''')
 
@@ -160,6 +199,7 @@ def main():
         parse_revisions(cursor, "revisions.txt")
     else:
         parse_projects(cursor, "projects-small.txt")
+        parse_projects_additional(cursor, "projects-additional-small.txt")
         parse_revisions(cursor, "revisions-small.txt")
 
     # Need to create index to select rows based on project id.

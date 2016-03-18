@@ -1,5 +1,37 @@
 # Get other attributes of projects
 p: Project = input;
-counts: output collection[string] of string;
+# Output (use only one letter to reduce size of output)
+o: output collection[string] of string;
 
-counts[p.id] << substring(format("%b", p.donations),0,1);
+
+# Only want Java projects
+ifall (i: int; !match(`^java$`, lowercase(p.programming_languages[i]))) {
+
+#if (len(n.code_repositories.revisions) > 0) {
+#    lastindex := len(repo.revisions) - 1;
+#    lastyear := yearof(repo.revisions[lastindex].commit_date);
+#    if (lastyear > 2013) {
+#    }
+
+# t - true
+# f - false
+#
+# created_date        |
+# size_of_description |
+# donations           |
+# number_of_licenses  |
+# number_of_operating_systems |
+# number_of_programming_languages |
+# number_of_topics
+data := format("%s|%d|%s|%d|%d|%d|%d",
+formattime("%d/%m/%y %H:%M:%S", p.created_date),
+len(p.description),
+substring(format("%b", p.donations),0,1),
+len(p.licenses),
+len(p.operating_systems),
+len(p.programming_languages),
+len(p.topics)
+);
+
+o[p.id] << data;
+}
