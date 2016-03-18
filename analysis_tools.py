@@ -23,7 +23,7 @@ class Revision(object):
         id_raw, date_raw, name_raw = db_row
         self.id = id_raw
         self.date = datetime.strptime(date_raw, "%d/%m/%y %H:%M:%S")
-        self.name = name_raw
+        self.author = name_raw
 
     def __str__(self):
         return "%s, %s, %s" % (self.id, str(self.date), self.name)
@@ -69,7 +69,7 @@ def get_revisions_before_cutoff(revisions, date):
 
 # Get the project founder from a list of revisions.
 def get_founder(revisions):
-    return revisions[0].name
+    return revisions[0].author
 
 # Return a random sample from a list, maintaining the original order of the list
 def get_random_sample(lst, n):

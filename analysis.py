@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from analysis_tools import *
 import feature_functions
 
+BACKTESTING_DAYS = 30
+
+
 def time_since_last_commit_distribution(db_connection):
     print """Distribution of projects according to time of last commit in
           days before cutoff date"""
@@ -41,22 +44,26 @@ def time_since_last_commit_distribution(db_connection):
         print ("[%d, %d]:" % (start, end)).ljust(16) + str(count)
 
 def compute_feature_vectors(db_connection, feature_functions):
+    
     projects = get_projects(db_connection)
 
     feature_vector = []
     label_vector = []
 
     for i, project in enumerate(projects):
+        
+        print "Processing", str(i), project.name + "."
+        
         revisions = get_revisions_for_project(db_connection, project.id)
-        revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
+        #revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
 
         backtest_cutoff_date = CUTOFF_DATE
 
         # Keep backtesting further back in time until there's no more revision
         # history.
         while True:
-            # One month at a time.
-            backtest_cutoff_date = backtest_cutoff_date - timedelta(days=30)
+            # Backtesting
+            backtest_cutoff_date = backtest_cutoff_date - timedelta(days=BACKTESTING_DAYS)
 
             backtest_revision_history = get_revisions_before_cutoff(revisions, backtest_cutoff_date)
             backtest_revision_future = get_revisions_after_cutoff(revisions, backtest_cutoff_date)
@@ -66,7 +73,7 @@ def compute_feature_vectors(db_connection, feature_functions):
 
             # Features
             feature_vector.append([feature_function(project, backtest_revision_history, backtest_cutoff_date) for feature_function in feature_functions])
-            
+
 
             # Label
             alive = len(backtest_revision_future) > 0
@@ -86,23 +93,27 @@ def main():
 
     # Keep only projects
     # Print a few projects
-    for i in range(0, 10):
-        print projects[i]
+    #for i in range(0, 10):
+    #    print projects[i]
 
     # Example, print the founder of project 10267115
-    revisions = get_revisions_for_project(db_connection, 10267115)
-    for rev in revisions:
-        print rev
-    print get_founder(revisions)
+    #revisions = get_revisions_for_project(db_connection, 10267115)
+    #for rev in revisions:
+    #    print rev
+    #print get_founder(revisions)
 
-    time_since_last_commit_distribution(db_connection)
+    #time_since_last_commit_distribution(db_connection)
+    
+    # Obtains each feature function
+    feature_functions_array = [getattr(feature_functions, feature_function) for feature_function in dir(feature_functions) if (callable(getattr(feature_functions, feature_function)))]
+
 
     features, labels = compute_feature_vectors(db_connection,
-        [feature_functions.date_before_last_revision])
+                        feature_functions_array)
 
     features = zip(*features)
 
-    plt.plot(features[0], labels, 'ro')
+    plt.plot(features[1], labels, 'ro')
     #plot.plot(features, labels, 'ro')
     #plt.axis([0, 6, 0, 20])
     plt.show()
