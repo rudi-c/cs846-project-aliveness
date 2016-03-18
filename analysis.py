@@ -113,7 +113,7 @@ def main():
 
     features = zip(*features)
 
-    plt.plot(features[1], labels, 'ro')
+    plt.plot(features[2], labels, 'ro')
     #plot.plot(features, labels, 'ro')
     #plt.axis([0, 6, 0, 20])
     plt.show()
