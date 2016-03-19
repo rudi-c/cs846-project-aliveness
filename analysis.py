@@ -137,9 +137,9 @@ def main():
         # Begin new plot (needed since plt is stateful)
         plt.figure()
         # Plot data points
-        plt.plot(feature_column, labels, 'ro')
+        plt.plot(feature_column, labels, 'ro', alpha=0.05)
         # Plot slighly above 1.0 to see things better.
-        plt.ylim(0, 1.1)
+        plt.ylim(-0.1, 1.1)
         # Save to file
         plt.savefig(PLOTS_DIR + feature_name + ".png")
 
