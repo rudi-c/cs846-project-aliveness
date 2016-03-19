@@ -3,8 +3,8 @@
 ## Installation
 
 ```
-sudo apt-get install python-gtk
-sudo apt-get install python-matplotlib
+sudo apt-get install python-gtk python-matplotlib python-scipy
+sudo pip install statsmodel
 ```
 
 ## Parsing mined data

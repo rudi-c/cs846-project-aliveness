@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from analysis_tools import *
+#from lowess import lowess
+from statsmodels.nonparametric.smoothers_lowess import lowess
+
 import feature_functions
 
 BACKTESTING_DAYS = 30
@@ -99,12 +102,29 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
     return feature_vector, label_vector
 
 def plot_binary_vs_continuous(name, continuous, binary, log):
+    points_in_order = sorted(zip(continuous, binary))
+    average_points = []
+    chunk_size = len(points_in_order) / 10
+    for i in xrange(0, len(points_in_order), chunk_size):
+        chunk_continuous, chunk_binary = zip(*points_in_order[i:i+chunk_size])
+        density = float(sum(chunk_binary)) / chunk_size
+        average_points.append((min(chunk_continuous), density))
+        average_points.append((max(chunk_continuous), density))
+
     # Begin new plot (needed since plt is stateful)
     fig = plt.figure()
     # Plot data points with some jittering to see the overlapping ones
     plt.plot(continuous, binary, 'ro', alpha=0.05)
+    # Locally weighted scatterplot smoothing
+    try:
+        xs, ys = zip(*average_points)
+        #yest = lowess(ys, xs, frac=0.04, return_sorted=False)
+        plt.plot(xs, ys)
+    except:
+        pass
     # Plot slighly above 1.0 to see things better.
     plt.ylim(-0.1, 1.1)
+
     if log:
         plt.xscale('log')
         # Save to file
@@ -147,6 +167,8 @@ def main():
 
     features, labels = compute_feature_vectors(db_connection,
                         feature_functions_array, args.nobt)
+
+    print "Got %d feature vectors" % len(features)
 
     # Transpose the feature vector list to index by
     # feature (column) rather than row.
