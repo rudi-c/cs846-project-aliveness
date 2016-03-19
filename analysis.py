@@ -43,7 +43,7 @@ def time_since_last_commit_distribution(db_connection):
     for (start, end), count in bins:
         print ("[%d, %d]:" % (start, end)).ljust(16) + str(count)
 
-def compute_feature_vectors(db_connection, feature_functions):
+def compute_feature_vectors(db_connection, feature_functions, nobt):
     
     projects = get_projects(db_connection)
 
@@ -79,12 +79,18 @@ def compute_feature_vectors(db_connection, feature_functions):
             alive = len(backtest_revision_future) > 0
             label_vector.append(alive)
 
+
+            # in the case of no backtesting
+            if nobt:
+                break
+
     return feature_vector, label_vector
 
 def main():
     # Command-line arguments.
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', action="store_true")
+    parser.add_argument('--nobt', action="store_true")
     args = parser.parse_args()
 
     db_connection = open_db(args.full)
@@ -110,7 +116,7 @@ def main():
 
 
     features, labels = compute_feature_vectors(db_connection,
-                        feature_functions_array)
+                        feature_functions_array, args.nobt)
 
     features = zip(*features)
 
