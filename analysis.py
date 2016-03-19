@@ -6,6 +6,7 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from analysis_tools import *
 import feature_functions
@@ -142,10 +143,14 @@ def main():
 
     for feature_name, feature_column in features_by_name.items():
         print "Plotting " + feature_name
+        feature_range = max(feature_column) - min(feature_column)
+        features_jitter = (np.random.rand(len(labels)) - 0.5) * feature_range / 100
+        jittered_features = np.array(feature_column) + features_jitter
+        jittered_labels = np.array(labels) + (np.random.rand(len(labels)) - 0.5) * 0.05
         # Begin new plot (needed since plt is stateful)
         plt.figure()
-        # Plot data points
-        plt.plot(feature_column, labels, 'ro', alpha=0.05)
+        # Plot data points with some jittering to see the overlapping ones
+        plt.plot(jittered_features, jittered_labels, 'ro', alpha=0.05)
         # Plot slighly above 1.0 to see things better.
         plt.ylim(-0.1, 1.1)
         # Save to file
