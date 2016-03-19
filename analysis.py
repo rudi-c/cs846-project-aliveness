@@ -51,14 +51,20 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
     feature_vector = []
     label_vector = []
 
+    skipped_counts = 0
+
     for i, project in enumerate(projects):
-
-        print "Processing", str(i), project.name
-
         revisions = get_revisions_for_project(db_connection, project.id)
-        #revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
+        revisions = get_revisions_before_cutoff(revisions, DATA_END_DATE)
 
-        backtest_cutoff_date = CUTOFF_DATE
+        if len(revisions) > 0:
+            print "Processing", str(i), project.name
+        else:
+            print "Skipping", str(i), project.name
+            skipped_counts += 1
+            continue
+
+        backtest_cutoff_date = DATA_END_DATE
 
         # Keep backtesting further back in time until there's no more revision
         # history.
@@ -86,6 +92,8 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
             # in the case of no backtesting
             if nobt:
                 break
+
+    print "Skipped %d/%d projects for having no revisions" % (skipped_counts, len(projects))
 
     return feature_vector, label_vector
 

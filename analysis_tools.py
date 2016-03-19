@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime, timedelta
 
 # September 1st 2013
-CUTOFF_DATE = datetime(2013, 9, 1)
+DATA_END_DATE = datetime(2013, 9, 1)
 
 class Project(object):
     def __init__(self, db_row):
