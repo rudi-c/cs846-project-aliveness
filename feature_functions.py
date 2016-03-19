@@ -68,7 +68,7 @@ def number_of_licenses(project, revisions, cutoff_date):
     return project.number_of_licenses
 
 def number_of_operating_systems(project, revisions, cutoff_date):
-    return project.number_of_licenses
+    return project.number_of_operating_systems
 
 def number_of_programming_languages(project, revisions, cutoff_date):
-    return project.number_of_licenses
+    return project.number_of_programming_languages

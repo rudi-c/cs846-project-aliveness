@@ -2,6 +2,7 @@
 
 import argparse
 import math
+import os
 import sys
 
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ from analysis_tools import *
 import feature_functions
 
 BACKTESTING_DAYS = 30
-
+PLOTS_DIR = "plots/"
 
 def time_since_last_commit_distribution(db_connection):
     print """Distribution of projects according to time of last commit in
@@ -117,16 +118,30 @@ def main():
     feature_functions_array = [getattr(feature_functions, feature_function)
                                for feature_function in dir(feature_functions)
                                if callable(getattr(feature_functions, feature_function))]
+    feature_names = [f.__name__ for f in feature_functions_array]
 
     features, labels = compute_feature_vectors(db_connection,
                         feature_functions_array, args.nobt)
 
-    features = zip(*features)
+    # Transpose the feature vector list to index by
+    # feature (column) rather than row.
+    features_as_columns = zip(*features)
 
-    plt.plot(features[0], labels, 'ro')
-    #plot.plot(features, labels, 'ro')
-    #plt.axis([0, 6, 0, 20])
-    plt.show()
+    features_by_name = {name: feature for name, feature in zip(feature_names, features_as_columns)}
+
+    if not os.path.exists(PLOTS_DIR):
+        os.makedirs(PLOTS_DIR)
+
+    for feature_name, feature_column in features_by_name.items():
+        print "Plotting " + feature_name
+        # Begin new plot (needed since plt is stateful)
+        plt.figure()
+        # Plot data points
+        plt.plot(feature_column, labels, 'ro')
+        # Plot slighly above 1.0 to see things better.
+        plt.ylim(0, 1.1)
+        # Save to file
+        plt.savefig(PLOTS_DIR + feature_name + ".png")
 
 
 if __name__ == "__main__":
