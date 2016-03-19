@@ -52,7 +52,7 @@ def compute_feature_vectors(db_connection, feature_functions):
 
     for i, project in enumerate(projects):
         
-        print "Processing", str(i), project.name + "."
+        print "Processing", str(i), project.name
         
         revisions = get_revisions_for_project(db_connection, project.id)
         #revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
@@ -105,6 +105,7 @@ def main():
     #time_since_last_commit_distribution(db_connection)
     
     # Obtains each feature function
+    # for some reason, the values come in the alphabetical order according to the name of the function
     feature_functions_array = [getattr(feature_functions, feature_function) for feature_function in dir(feature_functions) if (callable(getattr(feature_functions, feature_function)))]
 
 

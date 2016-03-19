@@ -10,9 +10,6 @@ CUTOFF_DATE = datetime(2013, 9, 1)
 class Project(object):
     def __init__(self, db_row):
         id_raw, name_raw, revision_count_raw, has_docs_raw, created_date_raw, description_size_raw, accepts_donations_raw, number_of_licenses_raw, number_of_operating_systems_raw, number_of_programming_languages_raw = db_row
-        print id_raw
-        print created_date_raw
-        print description_size_raw
         self.id = int(id_raw)
         self.name = name_raw
         self.revision_count = int(revision_count_raw)
