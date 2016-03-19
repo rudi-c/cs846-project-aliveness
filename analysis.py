@@ -44,16 +44,16 @@ def time_since_last_commit_distribution(db_connection):
         print ("[%d, %d]:" % (start, end)).ljust(16) + str(count)
 
 def compute_feature_vectors(db_connection, feature_functions, nobt):
-    
+
     projects = get_projects(db_connection)
 
     feature_vector = []
     label_vector = []
 
     for i, project in enumerate(projects):
-        
+
         print "Processing", str(i), project.name
-        
+
         revisions = get_revisions_for_project(db_connection, project.id)
         #revisions = get_revisions_before_cutoff(revisions, CUTOFF_DATE)
 
@@ -72,7 +72,9 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
                 break
 
             # Features
-            feature_vector.append([feature_function(project, backtest_revision_history, backtest_cutoff_date) for feature_function in feature_functions])
+            features = [feature_function(project, backtest_revision_history, backtest_cutoff_date)
+                        for feature_function in feature_functions]
+            feature_vector.append(features)
 
 
             # Label
@@ -109,11 +111,12 @@ def main():
     #print get_founder(revisions)
 
     #time_since_last_commit_distribution(db_connection)
-    
-    # Obtains each feature function
-    # for some reason, the values come in the alphabetical order according to the name of the function
-    feature_functions_array = [getattr(feature_functions, feature_function) for feature_function in dir(feature_functions) if (callable(getattr(feature_functions, feature_function)))]
 
+    # Obtains each feature function for some reason, the values come
+    # in the alphabetical order according to the name of the function
+    feature_functions_array = [getattr(feature_functions, feature_function)
+                               for feature_function in dir(feature_functions)
+                               if callable(getattr(feature_functions, feature_function))]
 
     features, labels = compute_feature_vectors(db_connection,
                         feature_functions_array, args.nobt)
