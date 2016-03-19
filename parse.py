@@ -59,19 +59,19 @@ def parse_projects_additional(cursor, filename):
 
     with open(filename) as f:
         for i, line in enumerate(f):
-            matches = re.match(r'o\[(.*)\] = ([^\|]*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)', line)
+            matches = re.match(r'o\[(.*)\] = ([^\|]*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)', line)
             project_id = int(matches.group(1))
             created_date = matches.group(2)
             description_size = int(matches.group(3))
-            number_of_licenses = bool(matches.group(4))
-            number_of_operating_systems = int(matches.group(5))
-            number_of_programming_languages = int(matches.group(6))
-            number_of_topics = int(matches.group(7))
+            accepts_donations = int(matches.group(4))
+            number_of_licenses = int(matches.group(5))
+            number_of_operating_systems = int(matches.group(6))
+            number_of_programming_languages = int(matches.group(7))
             
-            data = (created_date, description_size, number_of_licenses, number_of_operating_systems, number_of_programming_languages, number_of_topics, project_id)
+            data = (created_date, description_size, accepts_donations, number_of_licenses, number_of_operating_systems, number_of_programming_languages, project_id)
             
             try:
-                cursor.execute("UPDATE repos SET created_date=?, description_size=?, number_of_licenses=?, number_of_operating_systems=?, number_of_programming_languages=?, number_of_topics=? WHERE id=?", data)
+                cursor.execute("UPDATE repos SET created_date=?, description_size=?, accepts_donations=?, number_of_licenses=?, number_of_operating_systems=?, number_of_programming_languages=? WHERE id=?", data)
             except Exception as e:
                 print data
                 raise e
@@ -189,7 +189,7 @@ def main():
     cursor = conn.cursor()
 
     cursor.execute('''CREATE TABLE repos
-                      (id, name, revision_count, has_docs, created_date, description_size, accepts_donations, number_of_licenses, number_of_operating_systems, number_of_programming_languages, number_of_topics)''')
+                      (id, name, revision_count, has_docs, created_date, description_size, accepts_donations, number_of_licenses, number_of_operating_systems, number_of_programming_languages)''')
     cursor.execute('''CREATE TABLE revisions
                       (id, project, date, author)''')
 

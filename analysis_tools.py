@@ -4,16 +4,25 @@ import sqlite3
 
 from datetime import datetime, timedelta
 
-# September 1st
+# September 1st 2013
 CUTOFF_DATE = datetime(2013, 9, 1)
 
 class Project(object):
     def __init__(self, db_row):
-        id_raw, name_raw, revision_count_raw, has_docs_raw = db_row
+        id_raw, name_raw, revision_count_raw, has_docs_raw, created_date_raw, description_size_raw, accepts_donations_raw, number_of_licenses_raw, number_of_operating_systems_raw, number_of_programming_languages_raw = db_row
+        print id_raw
+        print created_date_raw
+        print description_size_raw
         self.id = int(id_raw)
         self.name = name_raw
         self.revision_count = int(revision_count_raw)
         self.has_docs = bool(int(has_docs_raw))
+        self.created_date = datetime.strptime(created_date_raw, "%d/%m/%y %H:%M:%S")
+        self.description_size = int(description_size_raw)
+        self.accepts_donations = bool(int(accepts_donations_raw))
+        self.number_of_licenses = int(number_of_licenses_raw)
+        self.number_of_operating_systems = int(number_of_operating_systems_raw)
+        self.number_of_programming_languages = int(number_of_programming_languages_raw)
 
     def __str__(self):
         return "%d, %s, %d, %r" % (self.id, self.name, self.revision_count, self.has_docs)
@@ -41,7 +50,11 @@ def open_db(full):
 # Return all project objects in the database.
 def get_projects(db_connection):
     cursor = db_connection.cursor()
-    cursor.execute('''SELECT id, name, revision_count, has_docs FROM repos
+    cursor.execute('''SELECT id, name, revision_count, has_docs,
+                                created_date, description_size, accepts_donations,
+                                number_of_licenses, number_of_operating_systems,
+                                number_of_programming_languages
+                                FROM repos
                    ''')
     projects = [Project(db_row) for db_row in cursor]
     return projects
