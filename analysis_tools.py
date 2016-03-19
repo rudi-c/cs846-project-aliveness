@@ -29,7 +29,7 @@ class Revision(object):
         self.author = name_raw
 
     def __str__(self):
-        return "%s, %s, %s" % (self.id, str(self.date), self.name)
+        return "%s, %s, %s" % (self.id, str(self.date), self.author)
 
 def open_db(full):
     if full:
