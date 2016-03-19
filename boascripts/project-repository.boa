@@ -17,18 +17,23 @@ visit(p, visitor {
         }
 
         # Look for a README file
-        # Store as int instead of bool so that the output uses less characteres.
+        # Store as int instead of bool so that the output uses less characters.
         has_readme := 0;
         files := getsnapshot(repo);
         foreach (i: int; def(files[i])) {
             fname := lowercase(files[i].name);
-            if (fname == "readme.md" || fname == "readme.txt") {
+            if (fname == "readme.md" || fname == "readme.txt" || fname == "readme") {
                 has_readme = 1;
             }
         }
 
-        data := format("%s|%d|%d",
-                       p.name, len(repo.revisions), has_readme);
+        data := format("%s|%d|%d|%s|%d|%d",
+                       p.name,
+                       len(repo.revisions),
+                       has_readme,
+                       formattime("%d/%m/%y %H:%M:%S", p.created_date),
+                       len(p.description),
+                       len(p.programming_languages));
         o[p.id] << data;
     }
 });

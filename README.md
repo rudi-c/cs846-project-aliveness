@@ -28,11 +28,9 @@ and create the local database `repos.db`.
 
 The full data is not included in repository due to file size.
 
-### Full project information (14mb)
+### Full project information (22mb)
 
-http://boa.cs.iastate.edu/boa/index.php?q=boa/job/public/33575
-
-http://boa.cs.iastate.edu/boa/index.php?q=boa/job/public/34179
+http://boa.cs.iastate.edu/boa/index.php?q=boa/job/public/34317
 
 ### Full revision history (947mb)
 

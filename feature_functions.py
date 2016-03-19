@@ -29,9 +29,6 @@ def date_before_last_revision_by_founder(project, revisions, cutoff_date):
         if revisions[i].author == founder:
             return (cutoff_date - revisions[i].date).days
 
-#def number_of_fixing_revisions(project, revisions, cutoff_date):
-#    pass
-
 def density_of_revisions(project, revisions, cutoff_date):
     days = (cutoff_date - revisions[0].date).days
     if days > 0:
@@ -60,15 +57,6 @@ def project_age(project, revisions, cutoff_date):
 
 def description_size(project, revisions, cutoff_date):
     return project.description_size
-
-def accepts_donations(project, revisions, cutoff_date):
-    return project.accepts_donations
-
-def number_of_licenses(project, revisions, cutoff_date):
-    return project.number_of_licenses
-
-def number_of_operating_systems(project, revisions, cutoff_date):
-    return project.number_of_operating_systems
 
 def number_of_programming_languages(project, revisions, cutoff_date):
     return project.number_of_programming_languages
