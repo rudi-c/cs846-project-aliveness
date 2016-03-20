@@ -15,8 +15,9 @@ def debug(*args):
 
 class Project(object):
     def __init__(self, db_row):
-        id_raw, name_raw, revision_count_raw, has_docs_raw, created_date_raw, descr_size_raw, num_languages_raw = db_row
+        id_raw, is_original_raw, name_raw, revision_count_raw, has_docs_raw, created_date_raw, descr_size_raw, num_languages_raw = db_row
         self.id = int(id_raw)
+        self.is_original = bool(int(is_original_raw))
         self.name = name_raw
         self.revision_count = int(revision_count_raw)
         self.has_docs = bool(int(has_docs_raw))
@@ -48,13 +49,15 @@ def open_db(full):
     return conn
 
 # Return all project objects in the database.
-def get_projects(db_connection):
+def get_projects(db_connection, use_forks=False):
     cursor = db_connection.cursor()
-    cursor.execute('''SELECT id, name, revision_count, has_docs,
+    cursor.execute('''SELECT id, is_original, name, revision_count, has_docs,
                                 created_date, descr_size, num_languages
                                 FROM repos
                    ''')
     projects = [Project(db_row) for db_row in cursor]
+    if not use_forks:
+        projects = [project for project in projects if project.is_original]
     return projects
 
 

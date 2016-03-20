@@ -31,53 +31,15 @@ def parse_projects(cursor, filename):
             created_date = matches.group(5)
             descr_size = int(matches.group(6))
             num_languages = int(matches.group(7))
+            is_original = True # we don't know otherwise yet, need to run fork detection script
 
-            data = (project_id, name, rev_count, has_docs,
+            data = (project_id, is_original, name, rev_count, has_docs,
                     created_date, descr_size, num_languages)
 
             try:
-                cursor.execute("INSERT INTO repos (id, name, revision_count, "
+                cursor.execute("INSERT INTO repos (id, is_original, name, revision_count, "
                                "has_docs, created_date, descr_size, num_languages) "
-                               "VALUES (?, ?, ?, ?, ?, ?, ?)", data)
-            except Exception as e:
-                print data
-                raise e
-
-            if i % 100 == 0:
-                # Using a carriage return allows the terminal to override
-                # the previous line, making it more like a progress effect.
-                print "%d lines read\r" % i,
-
-    print ""
-
-
-def parse_projects_additional(cursor, filename):
-    """
-        Expect lines of the format:
-        o[project id] = name|revision count|has docs
-
-        (Output of project-repository.boa)
-        """
-    if not os.path.isfile(filename):
-        raise Exception("Expected file %s" % filename)
-
-    print "Parsing projects again..."
-
-    with open(filename) as f:
-        for i, line in enumerate(f):
-            matches = re.match(r'o\[(.*)\] = ([^\|]*)\|(.*)\|(.*)\|(.*)\|(.*)\|(.*)', line)
-            project_id = int(matches.group(1))
-            created_date = matches.group(2)
-            description_size = int(matches.group(3))
-            accepts_donations = int(matches.group(4))
-            number_of_licenses = int(matches.group(5))
-            number_of_operating_systems = int(matches.group(6))
-            number_of_programming_languages = int(matches.group(7))
-
-            data = (created_date, description_size, accepts_donations, number_of_licenses, number_of_operating_systems, number_of_programming_languages, project_id)
-
-            try:
-                cursor.execute("UPDATE repos SET created_date=?, description_size=?, accepts_donations=?, number_of_licenses=?, number_of_operating_systems=?, number_of_programming_languages=? WHERE id=?", data)
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", data)
             except Exception as e:
                 print data
                 raise e
@@ -195,8 +157,8 @@ def main():
     cursor = conn.cursor()
 
     cursor.execute('''CREATE TABLE repos
-                      (id, name, revision_count, has_docs, created_date,
-                       descr_size, num_languages)''')
+                      (id, is_original, name, revision_count, has_docs,
+                       created_date, descr_size, num_languages)''')
     cursor.execute('''CREATE TABLE revisions
                       (id, project, date, author)''')
 
@@ -212,6 +174,9 @@ def main():
     # Otherwise it would read the whole table everytime we query revisions
     # for a project.
     cursor.execute('''CREATE INDEX rev_project_index ON revisions (project)''')
+
+    # Sometimes useful to index by project name, should be unique.
+    cursor.execute('''CREATE INDEX project_name_index ON repos (name)''')
 
     conn.commit()
     conn.close()

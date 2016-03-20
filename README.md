@@ -24,11 +24,18 @@ the `--full` flag. The program will expect to see the files `projects.txt` and
 `revisions-small.txt`. See download links below. This make take a few minutes
 and create the local database `repos.db`.
 
+It's useful to identify duplicate projects. To do so, run one of:
+```
+./forks.py [--full]
+pypy forks.py [--full]
+```
+
 The script `./analysis.py` performs creates some miscellaneous stats from the data.
 
-To use machine learning, first generate the feature file by running
+To use machine learning, first generate the feature file by running one of
 ```
-./features.py > features.arff
+./features.py [--full] > features.arff
+pypy features.py [--full] > features.arff
 ```
 
 Then run it through Weka, possibly with feature selection, with
