@@ -137,48 +137,7 @@ def plot_binary_vs_continuous(name, continuous, binary, log):
         plt.savefig(PLOTS_DIR + name + ".png")
     plt.close(fig)
 
-def main():
-    # Command-line arguments.
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--full', action="store_true")
-    parser.add_argument('--nobt', action="store_true")
-    args = parser.parse_args()
-
-    db_connection = open_db(args.full)
-
-    projects = get_projects(db_connection)
-
-    # Keep only projects
-    # Print a few projects
-    #for i in range(0, 10):
-    #    print projects[i]
-
-    # Example, print the founder of project 10267115
-    #revisions = get_revisions_for_project(db_connection, 10267115)
-    #for rev in revisions:
-    #    print rev
-    #print get_founder(revisions)
-
-    #time_since_last_commit_distribution(db_connection)
-
-    # Obtains each feature function for some reason, the values come
-    # in the alphabetical order according to the name of the function
-    feature_functions_array = [getattr(feature_functions, feature_function)
-                               for feature_function in dir(feature_functions)
-                               if callable(getattr(feature_functions, feature_function))]
-    feature_names = [f.__name__ for f in feature_functions_array]
-
-    features, labels = compute_feature_vectors(db_connection,
-                        feature_functions_array, args.nobt)
-
-    debug("Got %d feature vectors" % len(features))
-
-    # Transpose the feature vector list to index by
-    # feature (column) rather than row.
-    features_as_columns = zip(*features)
-
-    features_by_name = {name: feature for name, feature in zip(feature_names, features_as_columns)}
-
+def plot_all(features_by_name, labels):
     if not os.path.exists(PLOTS_DIR):
         os.makedirs(PLOTS_DIR)
 
@@ -197,6 +156,38 @@ def main():
             # It's common to plot log(x + 1) to deal with x = 0
             adjusted_features = jittered_features + np.ones(len(jittered_features))
             plot_binary_vs_continuous(feature_name, adjusted_features, jittered_labels, True)
+
+def main():
+    # Command-line arguments.
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--full', action="store_true")
+    parser.add_argument('--nobt', action="store_true")
+    args = parser.parse_args()
+
+    db_connection = open_db(args.full)
+
+    projects = get_projects(db_connection)
+
+    # Obtains each feature function for some reason, the values come
+    # in the alphabetical order according to the name of the function
+    feature_functions_array = [getattr(feature_functions, feature_function)
+                               for feature_function in dir(feature_functions)
+                               if callable(getattr(feature_functions, feature_function))]
+    feature_names = [f.__name__ for f in feature_functions_array]
+
+    features, labels = compute_feature_vectors(db_connection,
+                        feature_functions_array, args.nobt)
+
+    debug("Got %d feature vectors" % len(features))
+
+    # Transpose the feature vector list to index by
+    # feature (column) rather than row.
+    features_as_columns = zip(*features)
+
+    features_by_name = {name: feature
+                        for name, feature
+                        in zip(feature_names, features_as_columns)}
+    plot_all(features_by_name, labels)
 
 
 if __name__ == "__main__":
