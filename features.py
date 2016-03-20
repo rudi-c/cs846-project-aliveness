@@ -157,6 +157,27 @@ def plot_all(features_by_name, labels):
             adjusted_features = jittered_features + np.ones(len(jittered_features))
             plot_binary_vs_continuous(feature_name, adjusted_features, jittered_labels, True)
 
+def output_arff(feature_names, features, labels):
+    # Print header
+    print "@relation aliveness"
+    print ""
+
+    # Attributes/feature vector columns
+    for feature_name in feature_names:
+        print "@attribute " + feature_name + " numeric"
+
+    # Label attribute
+    print "@attribute alive {alive, dead}"
+
+    print ""
+    print "@data"
+    for feature_vector, label in zip(features, labels):
+        print ",".join(str(feature) for feature in feature_vector),
+        if label:
+            print "alive"
+        else:
+            print "dead"
+
 def main():
     # Command-line arguments.
     parser = argparse.ArgumentParser()
@@ -188,6 +209,7 @@ def main():
                         for name, feature
                         in zip(feature_names, features_as_columns)}
     plot_all(features_by_name, labels)
+    output_arff(feature_names, features, labels)
 
 
 if __name__ == "__main__":

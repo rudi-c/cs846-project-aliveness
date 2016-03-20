@@ -1,5 +1,6 @@
 *.db
 *.pyc
+*.arff
 projects.txt
 revisions.txt
 plots/

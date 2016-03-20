@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-sudo apt-get install python-gtk python-matplotlib python-scipy
+sudo apt-get install weka python-gtk python-matplotlib python-scipy
 sudo pip install statsmodel
 ```
 
