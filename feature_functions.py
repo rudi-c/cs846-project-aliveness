@@ -99,7 +99,7 @@ class FeaturesFunctions(object):
 
     # Documentation
     def has_docs(self):
-        return self.project.has_docs
+        return int(self.project.has_docs)
 
     # Others
     def project_age(self):
