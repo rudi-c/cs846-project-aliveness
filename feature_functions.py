@@ -42,6 +42,7 @@ class FeaturesFunctions(object):
 
     # People
     def number_of_contributors(self):
+        assert len(self.contributor_commit_counts) > 1
         return len(self.contributor_commit_counts)
 
     # Revisions / Commits

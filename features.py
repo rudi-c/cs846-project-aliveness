@@ -69,10 +69,23 @@ def compute_feature_vectors(db_connection, feature_functions_list, args):
             # Backtesting
             backtest_cutoff_date = backtest_cutoff_date - timedelta(days=BACKTESTING_DAYS)
 
+            # Our full dataset is really large, we can afford to drop a large
+            # portion of the rows.
+            if args.full and random.random() > 0.1:
+                continue
+
             backtest_revision_history = get_revisions_before_cutoff(revisions, backtest_cutoff_date)
             backtest_revision_future = get_revisions_after_cutoff(revisions, backtest_cutoff_date)
 
+            # No history to look at!
             if len(backtest_revision_history) == 0:
+                break
+
+            # Even if the full revision history has more than one contributor,
+            # it might not hold when backtesting.
+            if args.multionly and not more_than_one_contributor(backtest_revision_history):
+                break
+            if (backtest_revision_history[-1].date - backtest_revision_history[0].date).days < args.mindays:
                 break
 
             # Features

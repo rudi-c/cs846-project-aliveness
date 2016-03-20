@@ -9,6 +9,7 @@ TEMP_DIR = "temp/"
 def main():
     # Command-line arguments.
     parser = argparse.ArgumentParser()
+    parser.add_argument('--full', action="store_true")
     parser.add_argument('--featureselect', action="store_true")
     parser.add_argument("file", nargs=1)
     args = parser.parse_args()
@@ -18,7 +19,11 @@ def main():
     features_file = args.file[0]
     filtered_file = TEMP_DIR + "filtered.arff"
     input_file = features_file
-    min_instances_per_leaf = 50
+
+    if args.full:
+        min_instances_per_leaf = 2000
+    else:
+        min_instances_per_leaf = 50
 
     if args.featureselect:
         print "Performing feature selection..."
