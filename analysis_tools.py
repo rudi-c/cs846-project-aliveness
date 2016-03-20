@@ -1,11 +1,17 @@
+from __future__ import print_function
+
 import math
 import random
 import sqlite3
+import sys
 
 from datetime import datetime, timedelta
 
 # September 1st 2013
 DATA_END_DATE = datetime(2013, 9, 1)
+
+def debug(*args):
+    print(*args, file=sys.stderr)
 
 class Project(object):
     def __init__(self, db_row):

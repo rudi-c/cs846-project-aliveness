@@ -41,8 +41,8 @@ def time_since_last_commit_distribution(db_connection):
         if i % 100 == 0:
             # Using a carriage return allows the terminal to override
             # the previous line, making it more like a progress effect.
-            print ("%d percent of projects processed\r" %
-                   int(float(i) / len(projects) * 100)),
+            print >> sys.stderr, ("%d percent of projects processed\r" %
+                                   int(float(i) / len(projects) * 100)),
 
     print "Finished"
 
@@ -64,9 +64,9 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
         revisions = get_revisions_before_cutoff(revisions, DATA_END_DATE)
 
         if len(revisions) > 0:
-            print "Processing", str(i), project.name
+            debug("Processing", str(i), project.name)
         else:
-            print "Skipping", str(i), project.name
+            debug("Skipping", str(i), project.name)
             skipped_counts += 1
             continue
 
@@ -99,7 +99,8 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
             if nobt:
                 break
 
-    print "Skipped %d/%d projects for having no revisions" % (skipped_counts, len(projects))
+    debug("Skipped %d/%d projects for having no revisions"
+          % (skipped_counts, len(projects)))
 
     return feature_vector, label_vector
 
@@ -170,7 +171,7 @@ def main():
     features, labels = compute_feature_vectors(db_connection,
                         feature_functions_array, args.nobt)
 
-    print "Got %d feature vectors" % len(features)
+    debug("Got %d feature vectors" % len(features))
 
     # Transpose the feature vector list to index by
     # feature (column) rather than row.
@@ -182,7 +183,8 @@ def main():
         os.makedirs(PLOTS_DIR)
 
     for feature_name, feature_column in features_by_name.items():
-        print "Plotting %s - range [%f, %f]" % (feature_name, min(feature_column), max(feature_column))
+        debug("Plotting %s - range [%f, %f]"
+              % (feature_name, min(feature_column), max(feature_column)))
         feature_range = max(feature_column) - min(feature_column)
         features_jitter = (np.random.rand(len(labels)) - 0.5) * feature_range / 100
         jittered_features = np.array(feature_column) + features_jitter
