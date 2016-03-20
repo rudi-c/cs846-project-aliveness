@@ -87,6 +87,24 @@ Invalid (no commits?): 97317
 [32767, 65534]: 1
 ```
 
+Alternate result from analysis.py
+```
+[0, 0]:         86444
+[1, 2]:         16008
+[3, 6]:         16777
+[7, 14]:        18131
+[15, 30]:       19188
+[31, 62]:       19030
+[63, 126]:      17349
+[127, 254]:     13773
+[255, 510]:     11436
+[511, 1022]:    7060
+[1023, 2046]:   3802
+[2047, 4094]:   1165
+[4095, 8190]:   177
+[8191, 16382]:  55
+```
+
 # How many duplicate/forked projects are there?
 
 Use heuristic of looking at the hash of the first commit.
