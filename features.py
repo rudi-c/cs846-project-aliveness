@@ -27,7 +27,7 @@ def more_than_one_contributor(revisions):
             return True
     return False
 
-def compute_feature_vectors(db_connection, feature_functions, args):
+def compute_feature_vectors(db_connection, feature_functions_list, args):
 
     projects = get_projects(db_connection)
 
@@ -76,8 +76,10 @@ def compute_feature_vectors(db_connection, feature_functions, args):
                 break
 
             # Features
-            features = [feature_function(project, backtest_revision_history, backtest_cutoff_date)
-                        for feature_function in feature_functions]
+            feature_calculator = feature_functions.FeaturesFunctions(
+                project, backtest_revision_history, backtest_cutoff_date)
+            features = [feature_function(feature_calculator)
+                        for feature_function in feature_functions_list]
             feature_vector.append(features)
 
             # Label
@@ -240,11 +242,11 @@ def main():
 
     projects = get_projects(db_connection)
 
-    feature_functions_array = feature_functions.feature_functions()
-    feature_names = [f.__name__ for f in feature_functions_array]
+    feature_functions_list = feature_functions.feature_functions()
+    feature_names = [f.__name__ for f in feature_functions_list]
 
     features, labels = compute_feature_vectors(db_connection,
-                        feature_functions_array, args)
+                        feature_functions_list, args)
 
     debug("Got %d feature vectors" % len(features))
 
