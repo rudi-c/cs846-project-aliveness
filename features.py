@@ -197,11 +197,7 @@ def main():
 
     projects = get_projects(db_connection)
 
-    # Obtains each feature function for some reason, the values come
-    # in the alphabetical order according to the name of the function
-    feature_functions_array = [getattr(feature_functions, feature_function)
-                               for feature_function in dir(feature_functions)
-                               if callable(getattr(feature_functions, feature_function))]
+    feature_functions_array = feature_functions.feature_functions()
     feature_names = [f.__name__ for f in feature_functions_array]
 
     features, labels = compute_feature_vectors(db_connection,
