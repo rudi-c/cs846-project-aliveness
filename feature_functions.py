@@ -7,6 +7,20 @@ def percentage_contribution_for_top(revisions, number_of_contributors):
     sorted_by_count = sorted((count for count in counts.itervalues()), reverse=True)
     return float(sum(sorted_by_count[0:number_of_contributors])) / len(revisions)
 
+def number_of_contributors_days_sticking(revisions, n):
+    """Number of people whose earliest and latest commit spans more than n day"""
+    people_commit_dates = {}
+    for revision in revisions:
+        author = revision.author
+        if author in people_commit_dates:
+            previous_earliest, previous_latest = people_commit_dates[author]
+            people_commit_dates[author] = (min(previous_earliest, revision.date),
+                                           max(previous_latest, revision.date))
+        else:
+            people_commit_dates[author] = (revision.date, revision.date)
+    return sum((latest - earliest).days >= n
+               for (earliest, latest)
+               in people_commit_dates.itervalues())
 
 class FeaturesFunctions(object):
     # All features should have the arguments (project, revisions, cutoff_date)
@@ -18,6 +32,20 @@ class FeaturesFunctions(object):
         return len(unique_contributors)
 
     # Revisions / Commits
+    @staticmethod
+    def number_of_contributors_multiple_commits(project, revisions, cutoff_date):
+        """Number of people who've made more than one commit"""
+        counts = Counter(revision.author for revision in revisions)
+        return sum(count > 1 for count in counts.itervalues())
+
+    @staticmethod
+    def number_of_contributors_over_day(project, revisions, cutoff_date):
+        return number_of_contributors_days_sticking(revisions, 1)
+
+    @staticmethod
+    def number_of_contributors_over_week(project, revisions, cutoff_date):
+        return number_of_contributors_days_sticking(revisions, 7)
+
     @staticmethod
     def number_of_commits(project, revisions, cutoff_date):
         return len(revisions)
@@ -73,7 +101,9 @@ class FeaturesFunctions(object):
 
 
     # Documentation
-
+    @staticmethod
+    def has_docs(project, revisions, cutoff_date):
+        return project.has_docs
 
     # Others
     @staticmethod
