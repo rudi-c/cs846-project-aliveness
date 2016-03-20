@@ -11,20 +11,14 @@ sudo pip install statsmodel
 
 See `parse.py`
 
-The idea is to get all the data we need from Boa as a textfile, then read it
-and store it into a local sqlite database. It will be easier to do queries on
-a sqlite database, especially memory and performance-wise.
+The idea is to get all the data we need from Boa as a textfile, then read it and store it into a local sqlite database. It will be easier to do queries on a sqlite database, especially memory and performance-wise.
 
-To make a test run, use either `./parse.py` or `pypy parse.py` (faster). This
-will read the files `projects-small.txt`, `revisions-small.txt`,
-`activity-span.txt`. It will create the local database `repos_test.db`.
+To make a test run, use either `./parse.py` or `pypy parse.py` (faster). This will read the files `projects-small.txt`, `revisions-small.txt`, `activity-span.txt`. It will create the local database `repos_test.db`.
 
-To make create the database for the full GitHub 2015 dataset, use
-the `--full` flag. The program will expect to see the files `projects.txt` and
-`revisions-small.txt`. See download links below. This make take a few minutes
-and create the local database `repos.db`.
+To make create the database for the full GitHub 2015 dataset, use the `--full` flag. The program will expect to see the files `projects.txt` and `revisions-small.txt`. See download links below. This make take a few minutes and create the local database `repos.db`.
 
 It's useful to identify duplicate projects. To do so, run one of:
+
 ```
 ./forks.py [--full]
 pypy forks.py [--full]
@@ -32,13 +26,20 @@ pypy forks.py [--full]
 
 The script `./analysis.py` performs creates some miscellaneous stats from the data.
 
-To use machine learning, first generate the feature file by running one of
+To use machine learning, first generate the feature file by running
+
 ```
-./features.py [--full] > features.arff
-pypy features.py [--full] > features.arff
+./features.py [--full] [--nobt] [--multionly] [--mindays n] > features.arff
 ```
 
+`--nobt` disables backtesting
+
+`--multionly` excludes single-contributor repositories from consideration.
+
+`--mindays` excludes respositories whose activity period is less than the minimum number of days.
+
 Then run it through Weka, possibly with feature selection, with
+
 ```
 ./run_weka.py [--featureselect] features.arff
 ```
