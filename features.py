@@ -6,6 +6,7 @@
 import argparse
 import math
 import os
+import random
 import sys
 
 import matplotlib.pyplot as plt
@@ -178,6 +179,44 @@ def output_arff(feature_names, features, labels):
         else:
             print "dead"
 
+def balance_data(features, labels):
+    alive_count = labels.count(True)
+    dead_count = labels.count(False)
+    debug("    %d alive" % alive_count)
+    debug("    %d dead" % dead_count)
+
+    # Simplification : assume more dead instances
+    assert dead_count > alive_count
+
+    to_remove = dead_count - alive_count
+    debug("Dropping %d dead feature vector rows" % to_remove)
+
+    # Random undersampling
+    to_remove_indices = set(random.sample(xrange(dead_count), to_remove))
+
+    features_out = []
+    labels_out = []
+    dead_index = 0
+    for (feature_vector, label) in zip(features, labels):
+        # If dead
+        if not label:
+            if dead_index not in to_remove_indices:
+                features_out.append(feature_vector)
+                labels_out.append(label)
+            # Keep track of how many dead rows we've seen so far.
+            dead_index += 1
+        else:
+            # Keep all alive rows.
+            features_out.append(feature_vector)
+            labels_out.append(label)
+
+    alive_count = labels_out.count(True)
+    dead_count = labels_out.count(False)
+    assert alive_count == dead_count
+
+    return features_out, labels_out
+
+
 def main():
     # Command-line arguments.
     parser = argparse.ArgumentParser()
@@ -200,6 +239,10 @@ def main():
                         feature_functions_array, args.nobt)
 
     debug("Got %d feature vectors" % len(features))
+
+    # It is much prefered to have the same number of positive and negative samples.
+    # Otherwise, it's easy to get 98% accuracy if the data is 98:2...
+    features, labels = balance_data(features, labels)
 
     # Transpose the feature vector list to index by
     # feature (column) rather than row.
