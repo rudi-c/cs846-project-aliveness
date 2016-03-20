@@ -43,19 +43,23 @@ def compute_feature_vectors(db_connection, feature_functions, args):
         revisions = get_revisions_before_cutoff(revisions, DATA_END_DATE)
 
         if len(revisions) == 0:
-            debug("Skipping (no commits)", str(i), project.name)
+            if not args.full:
+                debug("Skipping (no commits)", str(i), project.name)
             skipped_counts_empty += 1
             continue
         if args.multionly and not more_than_one_contributor(revisions):
-            debug("Skipping (single-owner)", str(i), project.name)
+            if not args.full:
+                debug("Skipping (single-owner)", str(i), project.name)
             skipped_counts_single += 1
             continue
         if (revisions[-1].date - revisions[0].date).days < args.mindays:
-            debug("Skipping (less than min days)", str(i), project.name)
+            if not args.full:
+                debug("Skipping (less than min days)", str(i), project.name)
             skipped_counts_short += 1
             continue
 
-        debug("Processing", str(i), project.name)
+        if not args.full:
+            debug("Processing", str(i), project.name)
 
         backtest_cutoff_date = DATA_END_DATE
 
@@ -83,6 +87,12 @@ def compute_feature_vectors(db_connection, feature_functions, args):
             # in the case of no backtesting
             if args.nobt:
                 break
+
+        if i % 100 == 0 and args.full:
+            # Using a carriage return allows the terminal to override
+            # the previous line, making it more like a progress effect.
+            print >> sys.stderr, ("%d percent of projects processed\r" %
+                                   int(float(i) / len(projects) * 100)),
 
     debug("Skipped %d/%d projects for having no revisions"
           % (skipped_counts_empty, len(projects)))
