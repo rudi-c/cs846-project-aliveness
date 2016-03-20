@@ -86,3 +86,55 @@ Invalid (no commits?): 97317
 [8191, 16382]:  62
 [32767, 65534]: 1
 ```
+
+# How many duplicate/forked projects are there?
+
+Use heuristic of looking at the hash of the first commit.
+Script: fork.py
+
+Results
+```
+There are 2014 projects with 2 copies.
+There are 252 projects with 3 copies.
+There are 105 projects with 4 copies.
+There are 65 projects with 5 copies.
+There are 31 projects with 6 copies.
+There are 29 projects with 7 copies.
+There are 17 projects with 8 copies.
+There are 13 projects with 9 copies.
+There are 13 projects with 10 copies.
+There are 9 projects with 11 copies.
+There are 8 projects with 12 copies.
+There are 4 projects with 13 copies.
+There are 2 projects with 14 copies.
+There are 3 projects with 15 copies.
+There are 1 projects with 16 copies.
+There are 3 projects with 17 copies.
+There are 2 projects with 18 copies.
+There are 1 projects with 19 copies.
+There are 4 projects with 20 copies.
+There are 4 projects with 21 copies.
+There are 1 projects with 23 copies.
+There are 2 projects with 24 copies.
+There are 1 projects with 25 copies.
+There are 1 projects with 26 copies.
+There are 1 projects with 27 copies.
+There are 1 projects with 28 copies.
+There are 1 projects with 30 copies.
+There are 1 projects with 32 copies.
+There are 1 projects with 34 copies.
+There are 1 projects with 36 copies.
+There are 1 projects with 38 copies.
+There are 1 projects with 41 copies.
+There are 2 projects with 43 copies.
+There are 2 projects with 45 copies.
+There are 1 projects with 52 copies.
+There are 1 projects with 54 copies.
+There are 1 projects with 58 copies.
+There are 1 projects with 65 copies.
+There are 1 projects with 66 copies.
+There are 1 projects with 76 copies.
+There are 1 projects with 81 copies.
+There are 1 projects with 99 copies.
+A total of 5046/355641 projects have been marked as duplicates.
+```
