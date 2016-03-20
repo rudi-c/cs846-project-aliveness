@@ -1,5 +1,13 @@
 import inspect
 
+from collections import Counter
+
+def percentage_contribution_for_top(revisions, number_of_contributors):
+    counts = Counter(revision.author for revision in revisions)
+    sorted_by_count = sorted((count for count in counts.itervalues()), reverse=True)
+    return float(sum(sorted_by_count[0:number_of_contributors])) / len(revisions)
+
+
 class FeaturesFunctions(object):
     # All features should have the arguments (project, revisions, cutoff_date)
 
@@ -22,6 +30,18 @@ class FeaturesFunctions(object):
             if revisions[i].author == founder:
                 founder_revisions += 1
         return float(founder_revisions)/len(revisions) #in Python3, no need of float()
+
+    @staticmethod
+    def percentage_of_top2_contributors_revisions(project, revisions, cutoff_date):
+        return percentage_contribution_for_top(revisions, 2)
+
+    @staticmethod
+    def percentage_of_top3_contributors_revisions(project, revisions, cutoff_date):
+        return percentage_contribution_for_top(revisions, 3)
+
+    @staticmethod
+    def percentage_of_top5_contributors_revisions(project, revisions, cutoff_date):
+        return percentage_contribution_for_top(revisions, 5)
 
     @staticmethod
     def date_before_last_revision(project, revisions, cutoff_date):
@@ -69,7 +89,7 @@ class FeaturesFunctions(object):
         return project.number_of_programming_languages
 
 def feature_functions():
-    return [method
-            for name, method
-            in inspect.getmembers(FeaturesFunctions)
-            if not name.startswith('_')]
+    return sorted([method for name, method
+                          in inspect.getmembers(FeaturesFunctions)
+                          if not name.startswith('_')],
+                  key=lambda method: method.__name__)

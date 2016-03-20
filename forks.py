@@ -8,7 +8,6 @@ import os
 import sys
 
 from analysis_tools import *
-from collections import Counter
 
 TEMP_DIR = "temp/"
 

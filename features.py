@@ -111,7 +111,7 @@ def plot_all(features_by_name, labels):
     if not os.path.exists(PLOTS_DIR):
         os.makedirs(PLOTS_DIR)
 
-    for feature_name, feature_column in features_by_name.items():
+    for feature_name, feature_column in features_by_name:
         debug("Plotting %s - range [%f, %f]"
               % (feature_name, min(feature_column), max(feature_column)))
         feature_range = max(feature_column) - min(feature_column)
@@ -213,9 +213,9 @@ def main():
     # feature (column) rather than row.
     features_as_columns = zip(*features)
 
-    features_by_name = {name: feature
+    features_by_name = [(name, feature)
                         for name, feature
-                        in zip(feature_names, features_as_columns)}
+                        in zip(feature_names, features_as_columns)]
     plot_all(features_by_name, labels)
     output_arff(feature_names, features, labels)
 
