@@ -24,6 +24,18 @@ the `--full` flag. The program will expect to see the files `projects.txt` and
 `revisions-small.txt`. See download links below. This make take a few minutes
 and create the local database `repos.db`.
 
+The script `./analysis.py` performs creates some miscellaneous stats from the data.
+
+To use machine learning, first generate the feature file by running
+```
+./features.py > features.arff
+```
+
+Then run it through Weka, possibly with feature selection, with
+```
+./run_weka.py [--featureselect] features.arff
+```
+
 ## Full mining data
 
 The full data is not included in repository due to file size.
