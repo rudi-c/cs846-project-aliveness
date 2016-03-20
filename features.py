@@ -36,6 +36,7 @@ def compute_feature_vectors(db_connection, feature_functions, args):
 
     skipped_counts_empty = 0
     skipped_counts_single = 0
+    skipped_counts_short = 0
 
     for i, project in enumerate(projects):
         revisions = get_revisions_for_project(db_connection, project.id)
@@ -48,6 +49,10 @@ def compute_feature_vectors(db_connection, feature_functions, args):
         if args.multionly and not more_than_one_contributor(revisions):
             debug("Skipping (single-owner)", str(i), project.name)
             skipped_counts_single += 1
+            continue
+        if (revisions[-1].date - revisions[0].date).days < args.mindays:
+            debug("Skipping (less than min days)", str(i), project.name)
+            skipped_counts_short += 1
             continue
 
         debug("Processing", str(i), project.name)
@@ -84,6 +89,13 @@ def compute_feature_vectors(db_connection, feature_functions, args):
     if args.multionly:
         debug("Skipped %d/%d projects for having being a single-owner repository"
               % (skipped_counts_single, len(projects)))
+    if args.mindays > 0:
+        debug("Skipped %d/%d projects for having being alive less "
+              "than the minimum number of days"
+              % (skipped_counts_short, len(projects)))
+    debug("Skipped a total of %d/%d projects" %
+          (skipped_counts_empty + skipped_counts_single + skipped_counts_short,
+          len(projects)))
 
     return feature_vector, label_vector
 
@@ -167,30 +179,34 @@ def balance_data(features, labels):
     debug("    %d alive" % alive_count)
     debug("    %d dead" % dead_count)
 
-    # Simplification : assume more dead instances
-    assert dead_count > alive_count
-
-    to_remove = dead_count - alive_count
-    debug("Dropping %d dead feature vector rows" % to_remove)
+    to_remove = abs(dead_count - alive_count)
+    if alive_count > dead_count:
+        debug("Dropping %d alive feature vector rows" % to_remove)
+    else:
+        debug("Dropping %d dead feature vector rows" % to_remove)
 
     # Random undersampling
-    to_remove_indices = set(random.sample(xrange(dead_count), to_remove))
+    to_remove_indices = set(random.sample(xrange(max(alive_count, dead_count)),
+                                          to_remove))
 
     features_out = []
     labels_out = []
+    alive_index = 0
     dead_index = 0
     for (feature_vector, label) in zip(features, labels):
-        # If dead
-        if not label:
-            if dead_index not in to_remove_indices:
+        if label:
+            # Keep all alive rows.
+            if alive_count <= dead_count or alive_index not in to_remove_indices:
+                features_out.append(feature_vector)
+                labels_out.append(label)
+            alive_index += 1
+        else:
+            # If dead
+            if dead_count <= alive_count or dead_index not in to_remove_indices:
                 features_out.append(feature_vector)
                 labels_out.append(label)
             # Keep track of how many dead rows we've seen so far.
             dead_index += 1
-        else:
-            # Keep all alive rows.
-            features_out.append(feature_vector)
-            labels_out.append(label)
 
     alive_count = labels_out.count(True)
     dead_count = labels_out.count(False)
@@ -206,6 +222,8 @@ def main():
     parser.add_argument('--nobt', action="store_true")
     # Look at multi-owner repositories only.
     parser.add_argument('--multionly', action="store_true")
+    # Look at projects that have lasted more than 5 days only
+    parser.add_argument('--mindays', type=int, default=0)
     args = parser.parse_args()
 
     db_connection = open_db(args.full)
