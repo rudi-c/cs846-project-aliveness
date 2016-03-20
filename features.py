@@ -20,25 +20,37 @@ import feature_functions
 BACKTESTING_DAYS = 30
 PLOTS_DIR = "plots/"
 
-def compute_feature_vectors(db_connection, feature_functions, nobt):
+def more_than_one_contributor(revisions):
+    author = revisions[0].author
+    for revision in revisions:
+        if revision.author != author:
+            return True
+    return False
+
+def compute_feature_vectors(db_connection, feature_functions, args):
 
     projects = get_projects(db_connection)
 
     feature_vector = []
     label_vector = []
 
-    skipped_counts = 0
+    skipped_counts_empty = 0
+    skipped_counts_single = 0
 
     for i, project in enumerate(projects):
         revisions = get_revisions_for_project(db_connection, project.id)
         revisions = get_revisions_before_cutoff(revisions, DATA_END_DATE)
 
-        if len(revisions) > 0:
-            debug("Processing", str(i), project.name)
-        else:
-            debug("Skipping", str(i), project.name)
-            skipped_counts += 1
+        if len(revisions) == 0:
+            debug("Skipping (no commits)", str(i), project.name)
+            skipped_counts_empty += 1
             continue
+        if args.multionly and not more_than_one_contributor(revisions):
+            debug("Skipping (single-owner)", str(i), project.name)
+            skipped_counts_single += 1
+            continue
+
+        debug("Processing", str(i), project.name)
 
         backtest_cutoff_date = DATA_END_DATE
 
@@ -59,18 +71,19 @@ def compute_feature_vectors(db_connection, feature_functions, nobt):
                         for feature_function in feature_functions]
             feature_vector.append(features)
 
-
             # Label
             alive = len(backtest_revision_future) > 0
             label_vector.append(alive)
 
-
             # in the case of no backtesting
-            if nobt:
+            if args.nobt:
                 break
 
     debug("Skipped %d/%d projects for having no revisions"
-          % (skipped_counts, len(projects)))
+          % (skipped_counts_empty, len(projects)))
+    if args.multionly:
+        debug("Skipped %d/%d projects for having being a single-owner repository"
+              % (skipped_counts_single, len(projects)))
 
     return feature_vector, label_vector
 
@@ -191,6 +204,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', action="store_true")
     parser.add_argument('--nobt', action="store_true")
+    # Look at multi-owner repositories only.
+    parser.add_argument('--multionly', action="store_true")
     args = parser.parse_args()
 
     db_connection = open_db(args.full)
@@ -201,7 +216,7 @@ def main():
     feature_names = [f.__name__ for f in feature_functions_array]
 
     features, labels = compute_feature_vectors(db_connection,
-                        feature_functions_array, args.nobt)
+                        feature_functions_array, args)
 
     debug("Got %d feature vectors" % len(features))
 
