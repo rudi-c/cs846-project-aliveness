@@ -14,6 +14,8 @@ visit(p, visitor {
             lastyear := yearof(repo.revisions[lastindex].commit_date);
             if (lastyear > 2013)
                 stop;
+        } else {
+            stop;
         }
 
         # Look for a README file
