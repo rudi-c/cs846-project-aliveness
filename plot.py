@@ -14,7 +14,7 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 
 PLOTS_DIR = "plots/"
 
-def plot_binary_vs_continuous(name, continuous, binary, log):
+def plot_binary_vs_continuous(name, boxplot_values, continuous, binary, log):
     points_in_order = sorted(zip(continuous, binary))
     average_points = []
     chunk_size = min(len(points_in_order) / 10, 200)
@@ -38,6 +38,9 @@ def plot_binary_vs_continuous(name, continuous, binary, log):
     # Plot slighly above 1.0 to see things better.
     plt.ylim(-0.1, 1.1)
 
+    # Add a boxplot
+    plt.boxplot(boxplot_values, vert=False, positions=[0, 1])
+
     if log:
         plt.xscale('log')
         # Save to file
@@ -59,13 +62,18 @@ def plot_all(features_by_name, labels):
         jittered_features = np.array(feature_column) + features_jitter
         jittered_labels = np.array(labels) + (np.random.rand(len(labels)) - 0.5) * 0.05
 
-        plot_binary_vs_continuous(feature_name, jittered_features, jittered_labels, False)
+        values_alive = [v for (v, label) in zip(feature_column, labels) if label]
+        values_dead = [v for (v, label) in zip(feature_column, labels) if not label]
+
+        plot_binary_vs_continuous(feature_name, [values_alive, values_dead],
+                                  jittered_features, jittered_labels, False)
 
         # Not point in doing a log plot for data in [0, 1]
         if max(feature_column) > 1:
             # It's common to plot log(x + 1) to deal with x = 0
             adjusted_features = jittered_features + np.ones(len(jittered_features))
-            plot_binary_vs_continuous(feature_name, adjusted_features, jittered_labels, True)
+            plot_binary_vs_continuous(feature_name, [values_alive, values_dead],
+                                      adjusted_features, jittered_labels, True)
 
 def main():
     # Command-line arguments.
