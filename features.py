@@ -127,7 +127,7 @@ def compute_feature_vectors(db_connection, feature_functions_list, args):
 def plot_binary_vs_continuous(name, continuous, binary, log):
     points_in_order = sorted(zip(continuous, binary))
     average_points = []
-    chunk_size = len(points_in_order) / 10
+    chunk_size = min(len(points_in_order) / 10, 200)
     for i in xrange(0, len(points_in_order), chunk_size):
         chunk_continuous, chunk_binary = zip(*points_in_order[i:i+chunk_size])
         density = float(sum(chunk_binary)) / chunk_size
