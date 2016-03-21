@@ -29,7 +29,8 @@ The script `./analysis.py` performs creates some miscellaneous stats from the da
 To use machine learning, first generate the feature file by running
 
 ```
-./features.py [--full] [--nobt] [--multionly] [--mindays n] > features.arff
+./features.py [--full] [--nobt] [--multionly] [--mindays n] --out output.json
+pypy features.py [--full] [--nobt] [--multionly] [--mindays n] --out output.json
 ```
 
 `--nobt` disables backtesting
@@ -38,10 +39,22 @@ To use machine learning, first generate the feature file by running
 
 `--mindays` excludes respositories whose activity period is less than the minimum number of days.
 
+Convert the json into an arff file with:
+
+```
+./to_arff.py output.json > features.arff
+```
+
 Then run it through Weka, possibly with feature selection, with
 
 ```
 ./run_weka.py [--featureselect] features.arff
+```
+
+Make plots of the data with
+
+```
+./plot.py output.json
 ```
 
 ## Full mining data
