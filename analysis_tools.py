@@ -15,18 +15,23 @@ def debug(*args):
 
 class Project(object):
     def __init__(self, db_row):
-        id_raw, is_original_raw, name_raw, revision_count_raw, has_docs_raw, created_date_raw, descr_size_raw, num_languages_raw = db_row
+        id_raw, is_original_raw, name_raw, revision_count_raw, docs_raw, created_date_raw, descr_size_raw, num_languages_raw = db_row
         self.id = int(id_raw)
         self.is_original = bool(int(is_original_raw))
         self.name = name_raw
         self.revision_count = int(revision_count_raw)
-        self.has_docs = bool(int(has_docs_raw))
+        self.docs_readme = int(docs_raw) & 0x1;
+        self.docs_license = (int(docs_raw) >> 1) & 0x1;
+        self.docs_todo = (int(docs_raw) >> 2) & 0x1;
+        self.docs_install = (int(docs_raw) >> 3) & 0x1;
+        self.docs_contributing = (int(docs_raw) >> 4) & 0x1;
+        self.docs_changelog = (int(docs_raw) >> 5) & 0x1;
         self.created_date = datetime.strptime(created_date_raw, "%d/%m/%y %H:%M:%S")
         self.description_size = int(descr_size_raw)
         self.number_of_programming_languages = int(num_languages_raw)
 
     def __str__(self):
-        return "%d, %s, %d, %r" % (self.id, self.name, self.revision_count, self.has_docs)
+        return "%d, %s, %d" % (self.id, self.name, self.revision_count)
 
 class Revision(object):
     def __init__(self, db_row):
@@ -51,7 +56,7 @@ def open_db(full):
 # Return all project objects in the database.
 def get_projects(db_connection, use_forks=False):
     cursor = db_connection.cursor()
-    cursor.execute('''SELECT id, is_original, name, revision_count, has_docs,
+    cursor.execute('''SELECT id, is_original, name, revision_count, docs,
                                 created_date, descr_size, num_languages
                                 FROM repos
                    ''')

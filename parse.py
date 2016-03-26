@@ -27,18 +27,18 @@ def parse_projects(cursor, filename):
             project_id = int(matches.group(1))
             name = matches.group(2)
             rev_count = int(matches.group(3))
-            has_docs = bool(matches.group(4))
+            docs = int(matches.group(4))
             created_date = matches.group(5)
             descr_size = int(matches.group(6))
             num_languages = int(matches.group(7))
             is_original = True # we don't know otherwise yet, need to run fork detection script
 
-            data = (project_id, is_original, name, rev_count, has_docs,
+            data = (project_id, is_original, name, rev_count, docs,
                     created_date, descr_size, num_languages)
 
             try:
                 cursor.execute("INSERT INTO repos (id, is_original, name, revision_count, "
-                               "has_docs, created_date, descr_size, num_languages) "
+                               "docs, created_date, descr_size, num_languages) "
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", data)
             except Exception as e:
                 print data
@@ -157,7 +157,7 @@ def main():
     cursor = conn.cursor()
 
     cursor.execute('''CREATE TABLE repos
-                      (id, is_original, name, revision_count, has_docs,
+                      (id, is_original, name, revision_count, docs,
                        created_date, descr_size, num_languages)''')
     cursor.execute('''CREATE TABLE revisions
                       (id, project, date, author)''')

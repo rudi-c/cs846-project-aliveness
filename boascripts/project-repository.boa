@@ -1,7 +1,8 @@
-# Get the date and author of every revision of every relevant project.
+# Get relevant information for projects.
 p: Project = input;
 # Output (use only one letter to reduce size of output)
 o: output collection[string] of string;
+
 
 visit(p, visitor {
     before n: Project ->
@@ -18,21 +19,30 @@ visit(p, visitor {
             stop;
         }
 
-        # Look for a README file
-        # Store as int instead of bool so that the output uses less characters.
-        has_readme := 0;
+        # Look for for certain documentation-type files.
+        # Pack results in an int so that the output uses less characters.
+        documentation := 0;
         files := getsnapshot(repo);
         foreach (i: int; def(files[i])) {
             fname := lowercase(files[i].name);
-            if (fname == "readme.md" || fname == "readme.txt" || fname == "readme") {
-                has_readme = 1;
-            }
+            if (match(`.*readme($|\.md$|\.txt$)`, fname))
+                documentation = documentation + 1;
+            if (match(`.*license($|\.md$|\.txt$)`, fname))
+                documentation = documentation + 2;
+            if (match(`.*todo($|\.md$|\.txt$)`, fname))
+                documentation = documentation + 4;
+            if (match(`.*install($|\.md$|\.txt$)`, fname))
+                documentation = documentation + 8;
+            if (match(`.*contributing($|\.md$|\.txt$)`, fname))
+                documentation = documentation + 16;
+            if (match(`.*changelog($|\.md$|\.txt$)`, fname))
+                documentation = documentation + 32;
         }
 
         data := format("%s|%d|%d|%s|%d|%d",
                        p.name,
                        len(repo.revisions),
-                       has_readme,
+                       documentation,
                        formattime("%d/%m/%y %H:%M:%S", p.created_date),
                        len(p.description),
                        len(p.programming_languages));

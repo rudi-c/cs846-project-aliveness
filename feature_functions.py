@@ -42,7 +42,7 @@ class FeaturesFunctions(object):
 
     # People
     def number_of_contributors(self):
-        assert len(self.contributor_commit_counts) > 1
+        assert len(self.contributor_commit_counts) >= 1
         return len(self.contributor_commit_counts)
 
     # Revisions / Commits
@@ -97,10 +97,6 @@ class FeaturesFunctions(object):
                 largest_gap = (revision.date - previous_revision.date).days
             previous_revision = revision
         return largest_gap
-
-    # Documentation
-    def has_docs(self):
-        return int(self.project.has_docs)
 
     # Others
     def project_age(self):
