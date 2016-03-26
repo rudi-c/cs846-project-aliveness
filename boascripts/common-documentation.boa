@@ -1,6 +1,6 @@
-# What are the 30 most common .md and .txt files?
+# What are the 200 most common .md and .txt and no extension files?
 p: Project = input;
-counts: output top(100) of string weight int;
+counts: output top(200) of string weight int;
 
 visit(p, visitor {
     before n: Project ->
@@ -17,8 +17,10 @@ visit(p, visitor {
         files := getsnapshot(repo);
         foreach (i: int; def(files[i])) {
             fname := lowercase(files[i].name);
+            # Markdown files, text files and files with no extension.
             if (match(`\.md$`, fname) ||
-                match(`\.txt$`, fname))
+                match(`\.txt$`, fname) ||
+                match(`^([^.])+$`, fname))
                 counts << fname weight 1;
         }
     }
