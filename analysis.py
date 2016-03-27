@@ -150,9 +150,9 @@ def documentation_count(db_connection, days):
                     at_least_one_alive += 1
 
             if different_docs > 1:
-                at_least_one_total += 1
+                at_least_two_total += 1
                 if alive:
-                    at_least_one_alive += 1
+                    at_least_two_alive += 1
 
     def stuff(alive, total):
         if total > 0:
