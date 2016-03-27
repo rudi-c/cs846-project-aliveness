@@ -54,7 +54,7 @@ def plot_all(features_by_name, labels):
     if not os.path.exists(PLOTS_DIR):
         os.makedirs(PLOTS_DIR)
 
-    for feature_name, feature_column in features_by_name:
+    for feature_name, feature_column in features_by_name.iteritems():
         debug("Plotting %s - range [%f, %f]"
               % (feature_name, min(feature_column), max(feature_column)))
         feature_range = max(feature_column) - min(feature_column)
@@ -75,6 +75,46 @@ def plot_all(features_by_name, labels):
             plot_binary_vs_continuous(feature_name, [values_alive, values_dead],
                                       adjusted_features, jittered_labels, True)
 
+def box_plot(title, feature_values, labels, log):
+    print "Plotting " + title
+
+    values_alive = [v for (v, label) in zip(feature_values, labels) if label]
+    values_dead = [v for (v, label) in zip(feature_values, labels) if not label]
+
+    print ("Alive: Median %f, Mean %f, stdev %f" %
+           (np.median(values_alive), np.mean(values_alive), np.std(values_alive)))
+    print ("Dead: Median %f, Mean %f, stdev %f" %
+           (np.median(values_dead), np.mean(values_dead), np.std(values_dead)))
+
+    if log:
+        values_alive = [math.log10(value + 1) for value in values_alive]
+        values_dead = [math.log10(value + 1) for value in values_dead]
+
+    # Begin new plot (needed since plt is stateful)
+    fig = plt.figure()
+
+    ax = plt.subplot(1, 1, 1)
+
+    plt.figure(figsize=(5,8))
+
+    plt.title(title)
+
+    # Add a boxplot
+    plt.boxplot([values_alive, values_dead], vert=True, positions=[0, 1], widths=0.5)
+
+    plt.xticks([0, 1], ["alive", "dead"])
+
+    if log:
+        plt.yticks([0, math.log10(2), 1, 2, 3, 4], [0, 1, 10, 100, 1000, 10000])
+        plt.ylim(-0.1, 4.5)
+    else:
+        # Plot slighly above 1.0 to see things better.
+        plt.ylim(-0.1, 1.1)
+
+    # Save to file
+    plt.savefig(PLOTS_DIR + "boxplot: " + title + ".png")
+    plt.close(fig)
+
 def main():
     # Command-line arguments.
     parser = argparse.ArgumentParser()
@@ -92,9 +132,17 @@ def main():
     # feature (column) rather than row.
     features_as_columns = zip(*features)
 
-    features_by_name = [(name, feature)
+    features_by_name = {name: feature
                         for name, feature
-                        in zip(feature_names, features_as_columns)]
+                        in zip(feature_names, features_as_columns)}
+
+    box_plot("Date before last revision (log)",
+             features_by_name["date_before_last_revision"], labels, True)
+    box_plot("Date before last revision by founder (log)",
+             features_by_name["date_before_last_revision_by_founder"], labels, True)
+    box_plot("Percentage of founder revision",
+             features_by_name["percentage_of_founder_revisions"], labels, False)
+
     plot_all(features_by_name, labels)
 
 if __name__ == "__main__":
