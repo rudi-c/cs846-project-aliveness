@@ -111,3 +111,10 @@ def log_bin(lst):
         non_log_bins.append((int(pow(2.0, index)) - 1, count))
     non_log_bins = sorted(non_log_bins)
     return [((start, start * 2), str(count)) for start, count in non_log_bins]
+
+def more_than_one_contributor(revisions):
+    author = revisions[0].author
+    for revision in revisions:
+        if revision.author != author:
+            return True
+    return False

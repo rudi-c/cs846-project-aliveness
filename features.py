@@ -15,13 +15,6 @@ import feature_functions
 
 BACKTESTING_DAYS = 30
 
-def more_than_one_contributor(revisions):
-    author = revisions[0].author
-    for revision in revisions:
-        if revision.author != author:
-            return True
-    return False
-
 def compute_feature_vectors(db_connection, feature_functions_list, args):
 
     projects = get_projects(db_connection)

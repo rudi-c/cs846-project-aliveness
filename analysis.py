@@ -95,9 +95,23 @@ def documentation_count(db_connection, days):
     total_projects = 0
     alive_projects = 0
 
+    skipped_counts_empty = 0
+    skipped_counts_single = 0
+    skipped_counts_short = 0
+
     for i, project in enumerate(projects):
         revisions = get_revisions_for_project(db_connection, project.id)
         revisions = get_revisions_before_cutoff(revisions, DATA_END_DATE)
+
+        if len(revisions) == 0:
+            skipped_counts_empty += 1
+            continue
+        if not more_than_one_contributor(revisions):
+            skipped_counts_single += 1
+            continue
+        if (revisions[-1].date - revisions[0].date).days < 7:
+            skipped_counts_short += 1
+            continue
 
         # Make sure we have revisions at all
         if len(revisions) > 0:
@@ -153,6 +167,17 @@ def documentation_count(db_connection, days):
                 at_least_two_total += 1
                 if alive:
                     at_least_two_alive += 1
+
+    debug("Skipped %d/%d projects for having no revisions"
+          % (skipped_counts_empty, len(projects)))
+    debug("Skipped %d/%d projects for having being a single-owner repository"
+          % (skipped_counts_single, len(projects)))
+    debug("Skipped %d/%d projects for having being alive less "
+          "than the minimum number of days"
+          % (skipped_counts_short, len(projects)))
+    debug("Skipped a total of %d/%d projects" %
+          (skipped_counts_empty + skipped_counts_single + skipped_counts_short,
+          len(projects)))
 
     def stuff(alive, total):
         if total > 0:

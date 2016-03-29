@@ -136,11 +136,11 @@ def main():
                         for name, feature
                         in zip(feature_names, features_as_columns)}
 
-    box_plot("Date before last revision (log)",
+    box_plot("Date before last commit (log)",
              features_by_name["date_before_last_revision"], labels, True)
-    box_plot("Date before last revision by founder (log)",
+    box_plot("Date before last commit by founder (log)",
              features_by_name["date_before_last_revision_by_founder"], labels, True)
-    box_plot("Percentage of founder revision",
+    box_plot("Percentage of founder commit",
              features_by_name["percentage_of_founder_revisions"], labels, False)
 
     plot_all(features_by_name, labels)
